@@ -1,4 +1,4 @@
-    %% UT Power Plant Gas Turbine Analysis Base Case (Phase 1)
+%% UT Power Plant Gas Turbine Analysis Base Case (Phase 1)
 %
 % assumptions: RH0 = 0%, fuel = natural gas, entire turbine is adiabatic
 %
