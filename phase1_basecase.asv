@@ -78,7 +78,7 @@ nHPC = .84;
 nGEN = .977;
 
 % base case only
-p48 = 71 * psi2kPa; % kPa
+p48 = 71 * psi2kPa - p1; % kPa
 WdotELEC = 30.607 * 1000; % kW
 
 
