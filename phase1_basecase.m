@@ -196,7 +196,14 @@ allS = [ ...
     sb5r/M ];
 
 figure
-plot(allS, [T1 T2 T25 T3 T4 T48 T5], 'o-b', 'LineWidth', 2, 'MarkerSize', 6)
+hold on
+
+% Plot 1–2–25–3
+plot(allS(1:4), [T1 T2 T25 T3], 'o-b', 'LineWidth', 1, 'MarkerSize', 6)
+
+% Plot 4–48–5 separately
+plot(allS(5:7), [T4 T48 T5], 'o-b', 'LineWidth', 1, 'MarkerSize', 6)
+
 xlabel('Specific Entropy s (kJ/kg-K)')
 ylabel('Temperature T (K)')
 title('Gas Turbine T–s Diagram')
@@ -206,7 +213,7 @@ grid on
 text(allS, [T1 T2 T25 T3 T4 T48 T5], string(states), ...
     'VerticalAlignment','bottom','HorizontalAlignment','right')
 
-% --- add isentropic points as scatter (not connected)
+% --- add isentropic points
 S_iso = [sb25rs/M, sb3rs/M, sb48rs/M, sb5rs/M];
 T_iso = [T25s,     T3s,     T48s,    T5s];
 labels_iso = {'25s','3s','48s','5s'};
@@ -225,7 +232,7 @@ p_iso = [p1 p2 p25 p3 p4 p48 p5];
 colors = lines(length(p_iso));
 
 for k = 1:length(p_iso)
-    iso_curve = ts_isobar(p_iso(k), T1, 2000, yN2, yO2, p1, Rbar); % T from 200K–2000K
+    iso_curve = ts_isobar(p_iso(k), T1, 2000, yN2, yO2, p1, Rbar); 
     plot(iso_curve(:,1)/M, iso_curve(:,2), '--', 'Color', [0.5 0.5 0.5], 'LineWidth', 1)
 end
 
