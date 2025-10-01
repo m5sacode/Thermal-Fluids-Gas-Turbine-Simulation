@@ -229,13 +229,21 @@ T_iso = [T25s,     T3s,     T48s,    T5s];
 labels_iso = {'25s','3s','48s','5s'};
 
 hold on
-scatter(S_iso, T_iso, 60, 'r', 'x', 'LineWidth', 1.5)
+scatter(S_iso, T_iso, 60, [0.5 0.5 0.5], 'x', 'LineWidth', 1.5)
 
 % annotate isentropic points
 text(S_iso, T_iso, labels_iso, ...
     'VerticalAlignment','top', 'HorizontalAlignment','left', ...
-    'Color','r','FontSize',8)
+    'Color', [0.5 0.5 0.5],'FontSize',6)
 
+% --- define turbine inlets and connect to isentropic outlets
+S_in   = [sb2r/M, sb25r/M, sb4r/M, sb48r/M];   % entropy at turbine inlets
+T_in   = [T2,     T25,     T4,     T48];       % turbine inlet temperatures
+
+for k = 1:length(S_iso)
+    plot([S_iso(k) S_iso(k)], [T_in(k) T_iso(k)], ...
+         '--', 'Color', [0.5 0.5 0.5], 'LineWidth', 0.8)
+end
 
 % Pressures to plot
 % p_iso = [p1 p2 p25 p3 p4 p48 p5];
