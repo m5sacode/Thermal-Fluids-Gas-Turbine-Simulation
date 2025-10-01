@@ -82,9 +82,13 @@ p48 = 71 * psi2kPa; % kPa
 WdotELEC = 30.607 * 1000; % kW
 
 
+% Reference for real entropy change (TS (not taylor swift yet though :( ) diagram)
+sbref = 0;
+
 %% Analysis
 
 % state 1
+sb1r = sbref;
 v1 = (Rbar/M)*T1/p1;
 Vdot1 = mdotin*v1;
 
@@ -93,29 +97,36 @@ p2 = p1 - delPin;
 T2 = T1;
 hb2 = hbarcalc(T2,yN2,yO2);
 h2 = hb2 / M;
+sb2r=sb1r;
 
 % state 2 -> 25: LP compressor
 p25 = p2 * rLPC;
 sb2 = sbarcalc(T2, yN2, yO2);
 sb25s = sb2 + Rbar*log(p25/p2);
+sb25rs = sb2r + sb25s - sb2 - Rbar*log(p25/p2);
 T25s = TcalcS(sb25s, yN2, yO2);
 hb25s = hbarcalc(T25s, yN2, yO2);
 h25s = hb25s / M;
 h25 = h2 - (h2 - h25s)/nLPC;
 hb25 = h25 * M;
 T25 = TcalcH(hb25, yN2, yO2);
+sb25 = sbarcalc(T25, yN2, yO2);
+sb25r = sb2r + sb25 - sb2 - Rbar*log(p25/p2);
 WdotC1 = mdotin*(h2-h25);
 
 % state 25 -> 3: HP compressor
 p3 = p25 * rHPC;
 sb25 = sbarcalc(T25, yN2, yO2);
 sb3s = sb25 + Rbar*log(p3/p25);
+sb3rs = sb25r + sb3s - sb25 - Rbar*log(p3/p25);
 T3s = TcalcS(sb3s, yN2, yO2);
 hb3s = hbarcalc(T3s, yN2, yO2);
 h3s = hb3s / M;
 h3 = h25 - (h25 - h3s)/nHPC;
 hb3 = h3 * M;
 T3 = TcalcH(hb3, yN2, yO2);
+sb3 = sbarcalc(T3, yN2, yO2);
+sb3r = sb25r + sb3 - sb25 - Rbar*log(p3/p25);
 WdotC2 = mdotin*(h25-h3);
 
 % state 3 -> 4: combustor
@@ -125,14 +136,18 @@ h4 = (Qdot + mdotin*h3)/mdot4;
 hb4 = h4 * M;
 T4 = TcalcH(hb4, yN2, yO2);
 sb4 = sbarcalc(T4, yN2, yO2);
+p4 = p3;
+sb4r = sb3r + sb4 - sb3 - Rbar*log(p4/p3);
 
 % state 4 -> 48: HP turbine
 WdotT1 = -(WdotC1 + WdotC2);
 h48 = h4 - (WdotT1/mdot4);
 hb48 = h48 * M;
 T48 = TcalcH(hb48, yN2, yO2);
-p4 = p3;
+sb48 = sbarcalc(T48, yN2, yO2);
+sb48r = sb4r + sb48 - sb4 - Rbar*log(p48/p4);
 sb48s = sb4 + Rbar*log(p48/p4);
+sb48rs = sb4r + sb48s - sb4 - Rbar*log(p48/p4);
 T48s = TcalcS(sb48s, yN2, yO2);
 hb48s = hbarcalc(T48s, yN2, yO2);
 h48s = hb48s / M;
@@ -143,7 +158,10 @@ h5 = h48 - (WdotELEC/nGEN)/mdot4;
 hb5 = h5 * M;
 T5 = TcalcH(hb5, yN2, yO2);
 p5 = p1 + delPex;
-sb5s = sb48 + Rbar*log(p5/p48);
+sb5s = sb48 + Rbar*log(p5/p48); % FOUND THE ERROR: this used to be sb5s = sb48s + Rbar*log(p5/p48);
+sb5 = sbarcalc(T5, yN2, yO2);
+sb5r = sb48r + sb5 - sb48 - Rbar*log(p5/p48);
+sb5rs = sb48r;
 T5s = TcalcS(sb5s, yN2, yO2);
 hb5s = hbarcalc(T5s, yN2, yO2);
 h5s = hb5s / M;
@@ -166,3 +184,38 @@ nT1
 nT2
 
 
+%% T–s diagram
+% Collect specific entropies (kJ/kg-K). Divide s̄ (kJ/kmol-K) by M (kg/kmol).
+allS = [ ...
+    sb1r/M
+    sb2r/M
+    sb25r/M
+    sb3r/M
+    sb4r/M
+    sb48r/M
+    sb5r/M ];
+
+figure
+plot(allS, [T1 T2 T25 T3 T4 T48 T5], 'o-b', 'LineWidth', 2, 'MarkerSize', 6)
+xlabel('Specific Entropy s (kJ/kg-K)')
+ylabel('Temperature T (K)')
+title('Gas Turbine T–s Diagram')
+grid on
+
+% Label points
+text(allS, [T1 T2 T25 T3 T4 T48 T5], string(states), ...
+    'VerticalAlignment','bottom','HorizontalAlignment','right')
+
+% --- add isentropic points as scatter (not connected)
+S_iso = [sb25rs/M, sb3rs/M, sb48rs/M, sb5rs/M];
+T_iso = [T25s,     T3s,     T48s,    T5s];
+labels_iso = {'25s','3s','48s','5s'};
+
+hold on
+scatter(S_iso, T_iso, 60, 'r', 'x', 'LineWidth', 1.5)
+
+% annotate isentropic points
+text(S_iso, T_iso, labels_iso, ...
+    'VerticalAlignment','top', 'HorizontalAlignment','left', ...
+    'Color','r','FontSize',8)
+hold off
