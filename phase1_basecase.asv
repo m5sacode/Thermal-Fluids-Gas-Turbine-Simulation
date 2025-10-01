@@ -180,9 +180,9 @@ sb6r=sb5r + sb6 - sb5 - Rbar*log(p6/p5);
 %% Output Performance Parameters
 % table of T and p at each station, vol. flow rate at inlet, 
 
-states = [1 2 25 3 4 48 5 6]';
-allT = [T1 T2 T25 T3 T4 T48 T5 T6]';
-allp = [p1 p2 p25 p3 p4 p48 p5 p6]';
+states = [1 2 25 3 4 48 5]';
+allT = [T1 T2 T25 T3 T4 T48 T5]';
+allp = [p1 p2 p25 p3 p4 p48 p5]';
 
 data = [states allT, allp];
 
@@ -202,8 +202,7 @@ allS = [ ...
     sb3r/M
     sb4r/M
     sb48r/M
-    sb5r/M
-    sb6r/M];
+    sb5r/M ];
 
 figure
 hold on
@@ -211,8 +210,8 @@ hold on
 % Plot 1–2–25–3
 plot(allS(1:4), [T1 T2 T25 T3], 'o-b', 'LineWidth', 1, 'MarkerSize', 6)
 
-% Plot 4–48–5-6 separately
-plot(allS(5:8), [T4 T48 T5 T6], 'o-b', 'LineWidth', 1, 'MarkerSize', 6)
+% Plot 4–48–5 separately
+plot(allS(5:7), [T4 T48 T5], 'o-b', 'LineWidth', 1, 'MarkerSize', 6)
 
 xlabel('Specific Entropy s (kJ/kg-K)')
 ylabel('Temperature T (K)')
@@ -220,7 +219,7 @@ title('Gas Turbine T–s Diagram')
 grid on
 
 % Label points
-text(allS, [T1 T2 T25 T3 T4 T48 T5 T6], string(states), ...
+text(allS, [T1 T2 T25 T3 T4 T48 T5], string(states), ...
     'VerticalAlignment','bottom','HorizontalAlignment','right')
 
 % --- add isentropic points
@@ -254,14 +253,5 @@ plot(iso_curve_3s_3(:,1)/M, iso_curve_3s_3(:,2), '--', 'Color', [0.5 0.5 0.5], '
 
 iso_curve_3_4 = ts_isobar(p3, T1, T4, yN2, yO2, p1, Rbar, T3);
 plot(iso_curve_3_4(:,1)/M, iso_curve_3_4(:,2), '-', 'Color', [0 0 1], 'LineWidth', 1)
-
-iso_curve_48s_48 = ts_isobar(p48, T1, T48, yN2, yO2, p1, Rbar, T48s);
-plot(iso_curve_48s_48(:,1)/M, iso_curve_48s_48(:,2), '--', 'Color', [0.5 0.5 0.5], 'LineWidth', 1)
-
-iso_curve_5s_5 = ts_isobar(p5, T1, T5, yN2, yO2, p1, Rbar, T5s);
-plot(iso_curve_5s_5(:,1)/M, iso_curve_5s_5(:,2), '--', 'Color', [0.5 0.5 0.5], 'LineWidth', 1)
-
-iso_curve_1_6 = ts_isobar(p6, T1, T6, yN2, yO2, p1, Rbar, T1);
-plot(iso_curve_1_6(:,1)/M, iso_curve_1_6(:,2), '--', 'Color', [0 0 1], 'LineWidth', 1)
 
 hold off
