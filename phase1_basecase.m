@@ -218,4 +218,15 @@ scatter(S_iso, T_iso, 60, 'r', 'x', 'LineWidth', 1.5)
 text(S_iso, T_iso, labels_iso, ...
     'VerticalAlignment','top', 'HorizontalAlignment','left', ...
     'Color','r','FontSize',8)
+
+
+% Pressures to plot
+p_iso = [p1 p2 p25 p3 p4 p48 p5];
+colors = lines(length(p_iso));
+
+for k = 1:length(p_iso)
+    iso_curve = ts_isobar(p_iso(k), T1, 2000, yN2, yO2, p1, Rbar); % T from 200K–2000K
+    plot(iso_curve(:,1)/M, iso_curve(:,2), '--', 'Color', [0.5 0.5 0.5], 'LineWidth', 1)
+end
+
 hold off
