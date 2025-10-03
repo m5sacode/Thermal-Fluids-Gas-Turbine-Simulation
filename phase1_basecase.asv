@@ -31,7 +31,7 @@ hr2s = 3600;
 
 % ambient air conditions
 p1 = 14.417 * psi2kPa; % kPa
-T1 = (65 + 460) * R2K; % K
+T1 = (65 + 459.67) * R2K; % K
 yN2 = .79;
 yO2 = .21;
 
@@ -114,7 +114,7 @@ hb25 = h25 * M;
 T25 = TcalcH(hb25, yN2, yO2);
 sb25 = sbarcalc(T25, yN2, yO2);
 sb25r = sb2r + sb25 - sb2 - Rbar*log(p25/p2);
-WdotC1 = mdotin*(h2-h25);
+WdotC1 = mdotin*(h25-h2);
 
 % state 25 -> 3: HP compressor
 p3 = p25 * rHPC;
@@ -129,7 +129,7 @@ hb3 = h3 * M;
 T3 = TcalcH(hb3, yN2, yO2);
 sb3 = sbarcalc(T3, yN2, yO2);
 sb3r = sb25r + sb3 - sb25 - Rbar*log(p3/p25);
-WdotC2 = mdotin*(h25-h3);
+WdotC2 = mdotin*(h3-h25);
 
 % state 3 -> 4: combustor
 mdot4 = mdotin + mdotf;
@@ -142,7 +142,7 @@ p4 = p3;
 sb4r = sb3r + sb4 - sb3 - Rbar*log(p4/p3);
 
 % state 4 -> 48: HP turbine
-WdotT1 = -(WdotC1 + WdotC2);
+WdotT1 = WdotC1 + WdotC2;
 h48 = h4 - (WdotT1/mdot4);
 hb48 = h48 * M;
 T48 = TcalcH(hb48, yN2, yO2);
@@ -160,7 +160,7 @@ h5 = h48 - (WdotELEC/nGEN)/mdot4;
 hb5 = h5 * M;
 T5 = TcalcH(hb5, yN2, yO2);
 p5 = p1 + delPex;
-sb5s = sb48 + Rbar*log(p5/p48); % FOUND THE ERROR: this used to be sb5s = sb48s + Rbar*log(p5/p48);
+sb5s = sb48 + Rbar*log(p5/p48); 
 sb5 = sbarcalc(T5, yN2, yO2);
 sb5r = sb48r + sb5 - sb48 - Rbar*log(p5/p48);
 sb5rs = sb48r;
@@ -180,9 +180,9 @@ sb6r=sb5r + sb6 - sb5 - Rbar*log(p6/p5);
 %% Output Performance Parameters
 % table of T and p at each station, vol. flow rate at inlet, 
 
-states = [1 2 25 3 4 48 5]';
-allT = [T1 T2 T25 T3 T4 T48 T5]';
-allp = [p1 p2 p25 p3 p4 p48 p5]';
+states = [1 2 25 3 4 48 5 6]';
+allT = [T1 T2 T25 T3 T4 T48 T5 T6]';
+allp = [p1 p2 p25 p3 p4 p48 p5 p6]';
 
 data = [states allT, allp];
 
@@ -202,7 +202,8 @@ allS = [ ...
     sb3r/M
     sb4r/M
     sb48r/M
-    sb5r/M ];
+    sb5r/M
+    sb6r/M];
 
 figure
 hold on
@@ -210,8 +211,8 @@ hold on
 % Plot 1–2–25–3
 plot(allS(1:4), [T1 T2 T25 T3], 'o-b', 'LineWidth', 1, 'MarkerSize', 6)
 
-% Plot 4–48–5 separately
-plot(allS(5:7), [T4 T48 T5], 'o-b', 'LineWidth', 1, 'MarkerSize', 6)
+% Plot 4–48–5-6 separately
+plot(allS(5:8), [T4 T48 T5 T6], 'o-b', 'LineWidth', 1, 'MarkerSize', 6)
 
 xlabel('Specific Entropy s (kJ/kg-K)')
 ylabel('Temperature T (K)')
@@ -219,7 +220,7 @@ title('Gas Turbine T–s Diagram')
 grid on
 
 % Label points
-text(allS, [T1 T2 T25 T3 T4 T48 T5], string(states), ...
+text(allS, [T1 T2 T25 T3 T4 T48 T5 T6], string(states), ...
     'VerticalAlignment','bottom','HorizontalAlignment','right')
 
 % --- add isentropic points
@@ -228,13 +229,21 @@ T_iso = [T25s,     T3s,     T48s,    T5s];
 labels_iso = {'25s','3s','48s','5s'};
 
 hold on
-scatter(S_iso, T_iso, 60, 'r', 'x', 'LineWidth', 1.5)
+scatter(S_iso, T_iso, 60, [0.5 0.5 0.5], 'x', 'LineWidth', 1.5)
 
 % annotate isentropic points
 text(S_iso, T_iso, labels_iso, ...
     'VerticalAlignment','top', 'HorizontalAlignment','left', ...
-    'Color','r','FontSize',8)
+    'Color', [0.5 0.5 0.5],'FontSize',6)
 
+% --- define turbine inlets and connect to isentropic outlets
+S_in   = [sb2r/M, sb25r/M, sb4r/M, sb48r/M];   % entropy at turbine inlets
+T_in   = [T2,     T25,     T4,     T48];       % turbine inlet temperatures
+
+for k = 1:length(S_iso)
+    plot([S_iso(k) S_iso(k)], [T_in(k) T_iso(k)], ...
+         '--', 'Color', [0.5 0.5 0.5], 'LineWidth', 0.8)
+end
 
 % Pressures to plot
 % p_iso = [p1 p2 p25 p3 p4 p48 p5];
@@ -253,5 +262,14 @@ plot(iso_curve_3s_3(:,1)/M, iso_curve_3s_3(:,2), '--', 'Color', [0.5 0.5 0.5], '
 
 iso_curve_3_4 = ts_isobar(p3, T1, T4, yN2, yO2, p1, Rbar, T3);
 plot(iso_curve_3_4(:,1)/M, iso_curve_3_4(:,2), '-', 'Color', [0 0 1], 'LineWidth', 1)
+
+iso_curve_48s_48 = ts_isobar(p48, T1, T48, yN2, yO2, p1, Rbar, T48s);
+plot(iso_curve_48s_48(:,1)/M, iso_curve_48s_48(:,2), '--', 'Color', [0.5 0.5 0.5], 'LineWidth', 1)
+
+iso_curve_5s_5 = ts_isobar(p5, T1, T5, yN2, yO2, p1, Rbar, T5s);
+plot(iso_curve_5s_5(:,1)/M, iso_curve_5s_5(:,2), '--', 'Color', [0.5 0.5 0.5], 'LineWidth', 1)
+
+iso_curve_1_6 = ts_isobar(p6, T1, T6, yN2, yO2, p1, Rbar, T1);
+plot(iso_curve_1_6(:,1)/M, iso_curve_1_6(:,2), '--', 'Color', [0 0 1], 'LineWidth', 1)
 
 hold off

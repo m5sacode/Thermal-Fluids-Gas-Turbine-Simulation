@@ -31,7 +31,7 @@ hr2s = 3600;
 
 % ambient air conditions
 p1 = 14.417 * psi2kPa; % kPa
-T1 = (65 + 460) * R2K; % K
+T1 = (65 + 459.67) * R2K; % K
 yN2 = .79;
 yO2 = .21;
 
@@ -114,7 +114,7 @@ hb25 = h25 * M;
 T25 = TcalcH(hb25, yN2, yO2);
 sb25 = sbarcalc(T25, yN2, yO2);
 sb25r = sb2r + sb25 - sb2 - Rbar*log(p25/p2);
-WdotC1 = mdotin*(h2-h25);
+WdotC1 = mdotin*(h25-h2);
 
 % state 25 -> 3: HP compressor
 p3 = p25 * rHPC;
@@ -129,7 +129,7 @@ hb3 = h3 * M;
 T3 = TcalcH(hb3, yN2, yO2);
 sb3 = sbarcalc(T3, yN2, yO2);
 sb3r = sb25r + sb3 - sb25 - Rbar*log(p3/p25);
-WdotC2 = mdotin*(h25-h3);
+WdotC2 = mdotin*(h3-h25);
 
 % state 3 -> 4: combustor
 mdot4 = mdotin + mdotf;
@@ -142,7 +142,7 @@ p4 = p3;
 sb4r = sb3r + sb4 - sb3 - Rbar*log(p4/p3);
 
 % state 4 -> 48: HP turbine
-WdotT1 = -(WdotC1 + WdotC2);
+WdotT1 = WdotC1 + WdotC2;
 h48 = h4 - (WdotT1/mdot4);
 hb48 = h48 * M;
 T48 = TcalcH(hb48, yN2, yO2);
@@ -160,7 +160,7 @@ h5 = h48 - (WdotELEC/nGEN)/mdot4;
 hb5 = h5 * M;
 T5 = TcalcH(hb5, yN2, yO2);
 p5 = p1 + delPex;
-sb5s = sb48 + Rbar*log(p5/p48); % FOUND THE ERROR: this used to be sb5s = sb48s + Rbar*log(p5/p48);
+sb5s = sb48 + Rbar*log(p5/p48); 
 sb5 = sbarcalc(T5, yN2, yO2);
 sb5r = sb48r + sb5 - sb48 - Rbar*log(p5/p48);
 sb5rs = sb48r;
