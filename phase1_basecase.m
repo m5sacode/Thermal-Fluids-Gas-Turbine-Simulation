@@ -99,7 +99,7 @@ T2 = T1;
 hb2 = hbarcalc(T2,yN2,yO2);
 h2 = hb2 / M;
 sb2 = sbarcalc(T2, yN2, yO2);
-sb2r=sb1r + sb2 - sb1 - Rbar*log(p2/p1);
+sb2r = sb1r + sb2 - sb1 - Rbar*log(p2/p1);
 
 % state 2 -> 25: LP compressor
 p25 = p2 * rLPC;
@@ -174,7 +174,7 @@ nT2 = (h48-h5)/(h48-h5s);
 p6 = p1;
 T6 = T5;
 sb6 = sbarcalc(T6, yN2, yO2);
-sb6r=sb5r + sb6 - sb5 - Rbar*log(p6/p5);
+sb6r = sb5r + sb6 - sb5 - Rbar*log(p6/p5);
 
 
 %% Output Performance Parameters

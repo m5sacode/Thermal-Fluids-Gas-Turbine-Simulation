@@ -11,8 +11,8 @@ d2 = 182.55;
 
 err = 1;
 T = 272;
-while err > 1e-9
-    T = T+.01;
+while err > 1e-4
+    T = T+.001;
     sbest = yN2*(a1*T^3+b1*T^2+c1*T+d1) + yO2*(a2*T^3+b2*T^2+c2*T+d2);
     err = abs(sbest-sb);
 end
