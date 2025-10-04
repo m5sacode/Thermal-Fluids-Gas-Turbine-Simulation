@@ -23,8 +23,8 @@ O2so = table2array(data(:,"O2so"));
 %%
 
 % test interp at 425
-T = 291.83;
-idx = findvalue(Temps,T);
-sbar = valInterp(T,0,yN2,yO2)
-
-sbarpoly = sbarcalc(T,yN2, yO2)
+% T = 291.83;
+% idx = findvalue(Temps,T);
+% sbar = valInterp(T,0,yN2,yO2)
+% 
+% sbarpoly = sbarcalc(T,yN2, yO2)
