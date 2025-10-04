@@ -1,11 +1,13 @@
 %% calculate h bar given T
 function hb = hbarcalc(T, yN2, yO2)
 
-a1 = .0016;
-b1 = 29.365;
-c1 = -553.696;
-a2 = .0017;
-b2 = 31.041;
-c2 = -1123.8;
- 
-hb = yN2*(a1*T^2+b1*T+c1) + yO2*(a2*T^2+b2*T+c2);
+hb = valInterp(T, 1, yN2, yO2);
+
+% a1 = .0027;
+% b1 = 27.13;
+% c1 = 332.81;
+% a2 = .0028;
+% b2 = 28.726;
+% c2 = -232.2;
+% 
+% hb = yN2*(a1*T^2+b1*T+c1) + yO2*(a2*T^2+b2*T+c2);

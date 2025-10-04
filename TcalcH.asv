@@ -4,9 +4,9 @@
 function T = TcalcH(hb, yN2, yO2)
 
 err = 1;
-T = 250;
+T = 2;
 
-while err > 1e-1
+while err > 1e-2
     T = T + 0.001;
     hcalc = valInterp(T, 1, yN2, yO2);
     err = abs(hb-hcalc);
