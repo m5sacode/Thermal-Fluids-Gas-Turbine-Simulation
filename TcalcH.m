@@ -5,7 +5,7 @@ function T = TcalcH(hb)
 
 err = 1;
 Tmin = 250;
-Tmax = 1800;
+Tmax = 3200;
 
 while err > 1e-3
     T = (Tmin+Tmax)/2;

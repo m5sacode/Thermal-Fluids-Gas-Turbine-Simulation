@@ -7,7 +7,7 @@
 %
 % 
 
-function [PNET, mdotin, mdotout, nTH, T4, T6, SFC, HR] = phase1_calcs(nT1, nT2, Tin, mdotf, Vdot1)
+function [PNET, mdotin, mdotout, nTH, Tturb, Teng, SFC, HR] = phase1_calcs(nT1, nT2, Tin, mdotf, Vdot1b, RPM)
     %% Set Up
     
     % general constants
@@ -34,6 +34,7 @@ function [PNET, mdotin, mdotout, nTH, T4, T6, SFC, HR] = phase1_calcs(nT1, nT2, 
     
     % inlet air mass flow rate
     v1 = (Rbar/M)*T1/p1;
+    Vdot1 = Vdot1b * RPM/9784;
     mdot1 = Vdot1/v1; % kg/s
     
     % inlet pressure loss
@@ -144,11 +145,15 @@ function [PNET, mdotin, mdotout, nTH, T4, T6, SFC, HR] = phase1_calcs(nT1, nT2, 
     WdotELEC = WdotT2*nGEN;
 
     % state 6: after nozzle
+    p6 = p1;
+    
     T6 = T5;
     
     
     %% Output Performance Parameters
     
+    Tturb = T4 * 1/R2K - 459.67;
+    Teng = T6 * 1/R2K - 459.67;
     PNET = WdotELEC / 1000;
     mdotin = mdot1 * 1/lb2kg * hr2s; 
     mdotout = mdot4 * 1/lb2kg * hr2s; 

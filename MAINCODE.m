@@ -15,12 +15,89 @@ N2so = table2array(data(:,"N2so"));
 O2hi = table2array(data(:,"O2hi"));
 O2so = table2array(data(:,"O2so"));
 
-% gather base case info
-[nT1, nT2, Vdot1] = phase1_basecase(0);
+%% gather base case info
+[nT1, nT2, Vdot1b] = phase1_basecase(0);
 
-% varying inlet temps
+%% varying inlet temps
+T = [35 65 85 105];
+mdotf = [15981 14585 13518 12410];
+RPM = [9752 9784 9881 9974];
 
+WdotELEC = zeros(1,4); 
+mdotin = zeros(1,4);
+mdotout = zeros(1,4);
+nTH = zeros(1,4);
+T4 = zeros(1,4);
+T6 = zeros(1,4);
+SFC = zeros(1,4);
+HR = zeros(1,4);
 
+for i = 1:4
+    [WdotELEC(i), mdotin(i), mdotout(i), nTH(i), T4(i), T6(i), SFC(i), HR(i)] = phase1_calcs(nT1, nT2,T(i), mdotf(i), Vdot1b, RPM(i));
+end
 
-% varying fuel flow rate
-[WdotELEC, mdotin, mdotout, nTH, T4, T6, SFC, HR] = phase1_calcs(nT1, nT2, 65, 14585, Vdot1);
+% electrical power output
+figure
+plot(T, WdotELEC, '.', MarkerSize = 20)
+xlabel('T1 [ ^{\circ}F ]')
+ylabel('Electrical Power Output [ MW ]')
+title('Power Outlet vs Inlet Temperature')
+grid on
+
+% inlet mass flow rate
+figure
+plot(T, mdotin, '.', MarkerSize = 20)
+xlabel('T1 [ ^{\circ}F ]')
+ylabel('Mass Flow Rate [ lbm/hr ]')
+title('Inlet Mass Flow Rate vs Inlet Temperature')
+grid on
+
+% outlet mass flow rate
+figure
+plot(T, mdotout, '.', MarkerSize = 20)
+xlabel('T1 [ ^{\circ}F ]')
+ylabel('Mass Flow Rate [ lbm/hr ]')
+title('Outlet Mass Flow Rate vs Inlet Temperature')
+grid on
+
+% thermal efficiency
+figure
+plot(T, nTH, '.', MarkerSize = 20)
+xlabel('T1 [ ^{\circ}F ]')
+ylabel('Efficiency [ % ]')
+title('Thermal Efficiency vs Inlet Temperature')
+grid on
+
+% turbine inlet temp
+figure
+plot(T, T4, '.', MarkerSize = 20)
+xlabel('T1 [ ^{\circ}F ]')
+ylabel('T4 [ ^{\circ}F ]')
+title('Turbine Inlet Temperature vs Inlet Temperature')
+grid on
+
+% engine outlet temp
+figure
+plot(T, T6, '.', MarkerSize = 20)
+xlabel('T1 [ ^{\circ}F ]')
+ylabel('T6 [ ^{\circ}F ]')
+title('Engine Outlet Temperature vs Inlet Temperature')
+grid on
+
+% specific fuel consumption
+figure
+plot(T, SFC, '.', MarkerSize = 20)
+xlabel('T1 [ ^{\circ}F ]')
+ylabel('SFC [ lbm/kW-hr ]')
+title('Specific Fuel Consumption vs Inlet Temperature')
+grid on
+
+% heat rate
+figure
+plot(T, HR, '.', MarkerSize = 20)
+xlabel('T1 [ ^{\circ}F ]')
+ylabel('HR [ BTU/kW-hr ]')
+title('Heat Rate vs Inlet Temperature')
+grid on
+
+%% varying fuel flow rate

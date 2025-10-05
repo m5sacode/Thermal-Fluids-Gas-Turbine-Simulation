@@ -157,8 +157,8 @@ function [nT1, nT2, Vdot1] = phase1_basecase(TSplot)
     % table of T and p at each station, vol. flow rate at inlet, 
     
     states = [1 2 25 3 4 48 5 6]';
-    allT = [T1 T2 T25 T3 T4 T48 T5 T6]';
-    allp = [p1 p2 p25 p3 p4 p48 p5 p6]';
+    allT = 1/R2K*[T1 T2 T25 T3 T4 T48 T5 T6]';
+    allp = 1/psi2kPa*[p1 p2 p25 p3 p4 p48 p5 p6]';
     
     data = [states allT, allp];
     
