@@ -1,33 +1,21 @@
 %% calculate T given s bar
 % works for temperatures between 300K, 3000K
 
-function T = TcalcS(sb, yN2, yO2, Ti)
+function T = TcalcS(sb)
 
 err = 1;
-T = Ti;
+Tmin = 250;
+Tmax = 1800;
 
-while err > 1e-1
-    T = T + 0.001;
-    scalc = valInterp(T, 0, yN2, yO2);
+while err > 1e-3
+    T = (Tmin+Tmax)/2;
+    scalc = valInterp(T, 0);
     err = abs(sb-scalc);
+    if sb > scalc
+        Tmin = T;
+    elseif sb < scalc
+        Tmax = T;
+    end    
 end
 
-
-% a1 = 2e-8;
-% b1 = -7e-5;
-% c1 = .1186;
-% d1 = 161.96;
-% a2 = 2e-8;
-% b2 = -7e-5;
-% c2 = .1204;
-% d2 = 174.82;
-% 
-% A = yN2*a1 + yO2*a2;
-% B = yN2*b1 + yO2*b2;
-% C = yN2*c1 + yO2*c2;
-% D = yN2*d1 + yO2*d2;
-% 
-% f = @(T) (A*T.^3 + B*T.^2 + C*T + D) - sb; 
-% 
-% T = fzero(f, T2);
-
+end

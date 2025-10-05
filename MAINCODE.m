@@ -4,7 +4,7 @@ clear all
 close all
 clc
 
-global Temps N2hi N2so O2hi O2so
+global Temps N2hi N2so O2hi O2so yN2 yO2
 yN2 = .79;
 yO2 = .21;
 
@@ -15,16 +15,12 @@ N2so = table2array(data(:,"N2so"));
 O2hi = table2array(data(:,"O2hi"));
 O2so = table2array(data(:,"O2so"));
 
+% gather base case info
+[nT1, nT2, Vdot1] = phase1_basecase(0);
 
-% gather turbine efficiencies
-[nT1, nT2] = phase1_basecase();
+% varying inlet temps
 
 
-%%
 
-% test interp at 425
-% T = 291.83;
-% idx = findvalue(Temps,T);
-% sbar = valInterp(T,0,yN2,yO2)
-% 
-% sbarpoly = sbarcalc(T,yN2, yO2)
+% varying fuel flow rate
+[WdotELEC, mdotin, mdotout, nTH, T4, T6, SFC, HR] = phase1_calcs(nT1, nT2, 65, 14585, Vdot1);

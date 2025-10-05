@@ -1,5 +1,5 @@
-function value = valInterp(T, type, yN2, yO2)
-    global N2so O2so N2hi O2hi Temps
+function value = valInterp(T, type)
+    global N2so O2so N2hi O2hi Temps yN2 yO2
 
     if type == 0
         N2 = N2so;

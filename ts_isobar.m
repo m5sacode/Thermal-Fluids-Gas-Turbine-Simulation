@@ -1,11 +1,11 @@
 % Calculate T-s curve for an isobar
-function ts_isobar = ts_isobar(P, T0, T1, yN2, yO2, pref, Rbar, Tstart)
+function ts_isobar = ts_isobar(P, T0, T1, pref, Rbar, Tstart)
 
     % Temperature range
     Ts = linspace(T0, T1, 2000)'; % column vector (200 points)
 
     % Reference entropy at T0 (ideal gas entropy at pref)
-    sb0 = sbarcalc(T0, yN2, yO2);
+    sb0 = sbarcalc(T0);
 
     % Allocate entropy array
     s_rel = zeros(size(Ts));
@@ -13,7 +13,7 @@ function ts_isobar = ts_isobar(P, T0, T1, yN2, yO2, pref, Rbar, Tstart)
     % Loop over temperatures
     for i = 1:length(Ts)
         T = Ts(i);
-        sb = sbarcalc(T, yN2, yO2);
+        sb = sbarcalc(T);
         % Relative entropy at given P
         s_rel(i) = (sb - sb0 - Rbar*log(P/pref));
     end
