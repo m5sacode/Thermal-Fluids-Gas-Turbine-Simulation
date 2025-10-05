@@ -101,3 +101,85 @@ title('Heat Rate vs Inlet Temperature')
 grid on
 
 %% varying fuel flow rate
+
+T = 65;
+percent = [.2 .4 .6 .8 1];
+mdotf = 14585 * percent;
+RPM = 9784;
+
+WdotELEC = zeros(1,4); 
+mdotin = zeros(1,4);
+mdotout = zeros(1,4);
+nTH = zeros(1,4);
+T4 = zeros(1,4);
+T6 = zeros(1,4);
+SFC = zeros(1,4);
+HR = zeros(1,4);
+
+for i = 1:5
+    [WdotELEC(i), mdotin(i), mdotout(i), nTH(i), T4(i), T6(i), SFC(i), HR(i)] = phase1_calcs(nT1, nT2,T, mdotf(i), Vdot1b, RPM);
+end
+
+% electrical power output
+figure
+plot(percent * 100, WdotELEC, '.', MarkerSize = 20)
+xlabel('% Base Case Fuel Rate')
+ylabel('Electrical Power Output [ MW ]')
+title('Power Outlet vs Fuel Mass Flow Rate')
+grid on
+
+% inlet mass flow rate
+figure
+plot(percent * 100, mdotin, '.', MarkerSize = 20)
+xlabel('% Base Case Fuel Rate')
+ylabel('Mass Flow Rate [ lbm/hr ]')
+title('Inlet Mass Flow Rate vs Fuel Mass Flow Rate')
+grid on
+
+% outlet mass flow rate
+figure
+plot(percent * 100, mdotout, '.', MarkerSize = 20)
+xlabel('% Base Case Fuel Rate')
+ylabel('Mass Flow Rate [ lbm/hr ]')
+title('Outlet Mass Flow Rate vs Fuel Mass Flow Rate')
+grid on
+
+% thermal efficiency
+figure
+plot(percent * 100, nTH, '.', MarkerSize = 20)
+xlabel('% Base Case Fuel Rate')
+ylabel('Efficiency [ % ]')
+title('Thermal Efficiency vs Fuel Mass Flow Rate')
+grid on
+
+% turbine inlet temp
+figure
+plot(percent * 100, T4, '.', MarkerSize = 20)
+xlabel('% Base Case Fuel Rate')
+ylabel('T4 [ ^{\circ}F ]')
+title('Turbine Inlet Temperature vs Fuel Mass Flow Rate')
+grid on
+
+% engine outlet temp
+figure
+plot(percent * 100, T6, '.', MarkerSize = 20)
+xlabel('% Base Case Fuel Rate')
+ylabel('T6 [ ^{\circ}F ]')
+title('Engine Outlet Temperature vs Fuel Mass Flow Rate')
+grid on
+
+% specific fuel consumption
+figure
+plot(percent * 100, SFC, '.', MarkerSize = 20)
+xlabel('% Base Case Fuel Rate')
+ylabel('SFC [ lbm/kW-hr ]')
+title('Specific Fuel Consumption vs Fuel Mass Flow Rate')
+grid on
+
+% heat rate
+figure
+plot(percent * 100, HR, '.', MarkerSize = 20)
+xlabel('% Base Case Fuel Rate')
+ylabel('HR [ BTU/kW-hr ]')
+title('Heat Rate vs Fuel Mass Flow Rate')
+grid on
