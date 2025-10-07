@@ -23,7 +23,7 @@ T = [35 65 85 105];
 mdotf = [15981 14585 13518 12410];
 RPM = [9752 9784 9881 9974];
 
-WdotELEC = zeros(1,4); 
+PNET = zeros(1,4); 
 mdotin = zeros(1,4);
 mdotout = zeros(1,4);
 nTH = zeros(1,4);
@@ -33,12 +33,12 @@ SFC = zeros(1,4);
 HR = zeros(1,4);
 
 for i = 1:4
-    [WdotELEC(i), mdotin(i), mdotout(i), nTH(i), T4(i), T6(i), SFC(i), HR(i)] = phase1_calcs(nT1, nT2,T(i), mdotf(i), Vdot1b, RPM(i));
+    [PNET(i), mdotin(i), mdotout(i), nTH(i), T4(i), T6(i), SFC(i), HR(i)] = phase1_calcs(nT1, nT2,T(i), mdotf(i), Vdot1b, RPM(i));
 end
 
 % electrical power output
 figure
-plot(T, WdotELEC, '.', MarkerSize = 20)
+plot(T, PNET, '.', MarkerSize = 20)
 xlabel('T1 [ ^{\circ}F ]')
 ylabel('Electrical Power Output [ MW ]')
 title('Power Outlet vs Inlet Temperature')
@@ -107,7 +107,7 @@ percent = [.2 .4 .6 .8 1];
 mdotf = 14585 * percent;
 RPM = 9784;
 
-WdotELEC = zeros(1,4); 
+PNET = zeros(1,4); 
 mdotin = zeros(1,4);
 mdotout = zeros(1,4);
 nTH = zeros(1,4);
@@ -117,12 +117,12 @@ SFC = zeros(1,4);
 HR = zeros(1,4);
 
 for i = 1:5
-    [WdotELEC(i), mdotin(i), mdotout(i), nTH(i), T4(i), T6(i), SFC(i), HR(i)] = phase1_calcs(nT1, nT2,T, mdotf(i), Vdot1b, RPM);
+    [PNET(i), mdotin(i), mdotout(i), nTH(i), T4(i), T6(i), SFC(i), HR(i)] = phase1_calcs(nT1, nT2,T, mdotf(i), Vdot1b, RPM);
 end
 
 % electrical power output
 figure
-plot(percent * 100, WdotELEC, '.', MarkerSize = 20)
+plot(percent * 100, PNET, '.', MarkerSize = 20)
 xlabel('% Base Case Fuel Rate')
 ylabel('Electrical Power Output [ MW ]')
 title('Power Outlet vs Fuel Mass Flow Rate')
