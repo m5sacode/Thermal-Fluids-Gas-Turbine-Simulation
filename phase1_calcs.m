@@ -130,7 +130,6 @@ function [PNET, mdotin, mdotout, nTH, Tturb, Teng, SFC, HR] = phase1_calcs(nT1, 
     T48s = TcalcH(hb48s);
     sb48s = sbarcalc(T48s);
     p48 = p4*exp((sb48s-sb4)/Rbar);
-
     
     % state 48 -> 5: LP turbine
     p5 = p1 + delPex;
