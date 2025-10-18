@@ -4,6 +4,9 @@ clear all
 close all
 clc
 
+% output all plots in full screen
+set(groot, 'defaultFigureWindowState', 'maximized');
+
 global Temps N2hi N2so O2hi O2so yN2 yO2
 yN2 = .79;
 yO2 = .21;
@@ -36,16 +39,9 @@ for i = 1:4
     [PNET(i), mdotin(i), mdotout(i), nTH(i), T4(i), T6(i), SFC(i), HR(i)] = phase1_calcs(nT1, nT2,T(i), mdotf(i), Vdot1b, RPM(i));
 end
 
-% electrical power output
-figure
-plot(T, PNET, '.', MarkerSize = 20)
-xlabel('T1 [ ^{\circ}F ]')
-ylabel('Electrical Power Output [ MW ]')
-title('Power Outlet vs Inlet Temperature')
-grid on
-
 % inlet mass flow rate
 figure
+subplot(2,2,1)
 plot(T, mdotin, '.', MarkerSize = 20)
 xlabel('T1 [ ^{\circ}F ]')
 ylabel('Mass Flow Rate [ lbm/hr ]')
@@ -53,23 +49,15 @@ title('Inlet Mass Flow Rate vs Inlet Temperature')
 grid on
 
 % outlet mass flow rate
-figure
+subplot(2,2,2)
 plot(T, mdotout, '.', MarkerSize = 20)
 xlabel('T1 [ ^{\circ}F ]')
 ylabel('Mass Flow Rate [ lbm/hr ]')
 title('Outlet Mass Flow Rate vs Inlet Temperature')
 grid on
 
-% thermal efficiency
-figure
-plot(T, nTH, '.', MarkerSize = 20)
-xlabel('T1 [ ^{\circ}F ]')
-ylabel('Efficiency [ % ]')
-title('Thermal Efficiency vs Inlet Temperature')
-grid on
-
 % turbine inlet temp
-figure
+subplot(2,2,3)
 plot(T, T4, '.', MarkerSize = 20)
 xlabel('T1 [ ^{\circ}F ]')
 ylabel('T4 [ ^{\circ}F ]')
@@ -77,15 +65,32 @@ title('Turbine Inlet Temperature vs Inlet Temperature')
 grid on
 
 % engine outlet temp
-figure
+subplot(2,2,4)
 plot(T, T6, '.', MarkerSize = 20)
 xlabel('T1 [ ^{\circ}F ]')
 ylabel('T6 [ ^{\circ}F ]')
 title('Engine Outlet Temperature vs Inlet Temperature')
 grid on
 
-% specific fuel consumption
+% electrical power output
 figure
+subplot(2,2,1)
+plot(T, PNET, '.', MarkerSize = 20)
+xlabel('T1 [ ^{\circ}F ]')
+ylabel('Electrical Power Output [ MW ]')
+title('Power Outlet vs Inlet Temperature')
+grid on
+
+% thermal efficiency
+subplot(2,2,2)
+plot(T, nTH, '.', MarkerSize = 20)
+xlabel('T1 [ ^{\circ}F ]')
+ylabel('Efficiency [ % ]')
+title('Thermal Efficiency vs Inlet Temperature')
+grid on
+
+% specific fuel consumption
+subplot(2,2,3)
 plot(T, SFC, '.', MarkerSize = 20)
 xlabel('T1 [ ^{\circ}F ]')
 ylabel('SFC [ lbm/kW-hr ]')
@@ -93,7 +98,7 @@ title('Specific Fuel Consumption vs Inlet Temperature')
 grid on
 
 % heat rate
-figure
+subplot(2,2,4)
 plot(T, HR, '.', MarkerSize = 20)
 xlabel('T1 [ ^{\circ}F ]')
 ylabel('HR [ BTU/kW-hr ]')
@@ -120,16 +125,9 @@ for i = 1:5
     [PNET(i), mdotin(i), mdotout(i), nTH(i), T4(i), T6(i), SFC(i), HR(i)] = phase1_calcs(nT1, nT2,T, mdotf(i), Vdot1b, RPM);
 end
 
-% electrical power output
-figure
-plot(percent * 100, PNET, '.', MarkerSize = 20)
-xlabel('% Base Case Fuel Rate')
-ylabel('Electrical Power Output [ MW ]')
-title('Power Outlet vs Fuel Mass Flow Rate')
-grid on
-
 % inlet mass flow rate
 figure
+subplot(2,2,1)
 plot(percent * 100, mdotin, '.', MarkerSize = 20)
 xlabel('% Base Case Fuel Rate')
 ylabel('Mass Flow Rate [ lbm/hr ]')
@@ -137,23 +135,15 @@ title('Inlet Mass Flow Rate vs Fuel Mass Flow Rate')
 grid on
 
 % outlet mass flow rate
-figure
+subplot(2,2,2)
 plot(percent * 100, mdotout, '.', MarkerSize = 20)
 xlabel('% Base Case Fuel Rate')
 ylabel('Mass Flow Rate [ lbm/hr ]')
 title('Outlet Mass Flow Rate vs Fuel Mass Flow Rate')
 grid on
 
-% thermal efficiency
-figure
-plot(percent * 100, nTH, '.', MarkerSize = 20)
-xlabel('% Base Case Fuel Rate')
-ylabel('Efficiency [ % ]')
-title('Thermal Efficiency vs Fuel Mass Flow Rate')
-grid on
-
 % turbine inlet temp
-figure
+subplot(2,2,3)
 plot(percent * 100, T4, '.', MarkerSize = 20)
 xlabel('% Base Case Fuel Rate')
 ylabel('T4 [ ^{\circ}F ]')
@@ -161,15 +151,32 @@ title('Turbine Inlet Temperature vs Fuel Mass Flow Rate')
 grid on
 
 % engine outlet temp
-figure
+subplot(2,2,4)
 plot(percent * 100, T6, '.', MarkerSize = 20)
 xlabel('% Base Case Fuel Rate')
 ylabel('T6 [ ^{\circ}F ]')
 title('Engine Outlet Temperature vs Fuel Mass Flow Rate')
 grid on
 
-% specific fuel consumption
+% electrical power output
 figure
+subplot(2,2,1)
+plot(percent * 100, PNET, '.', MarkerSize = 20)
+xlabel('% Base Case Fuel Rate')
+ylabel('Electrical Power Output [ MW ]')
+title('Power Outlet vs Fuel Mass Flow Rate')
+grid on
+
+% thermal efficiency
+subplot(2,2,2)
+plot(percent * 100, nTH, '.', MarkerSize = 20)
+xlabel('% Base Case Fuel Rate')
+ylabel('Efficiency [ % ]')
+title('Thermal Efficiency vs Fuel Mass Flow Rate')
+grid on
+
+% specific fuel consumption
+subplot(2,2,3)
 plot(percent * 100, SFC, '.', MarkerSize = 20)
 xlabel('% Base Case Fuel Rate')
 ylabel('SFC [ lbm/kW-hr ]')
@@ -177,7 +184,7 @@ title('Specific Fuel Consumption vs Fuel Mass Flow Rate')
 grid on
 
 % heat rate
-figure
+subplot(2,2,4)
 plot(percent * 100, HR, '.', MarkerSize = 20)
 xlabel('% Base Case Fuel Rate')
 ylabel('HR [ BTU/kW-hr ]')
