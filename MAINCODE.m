@@ -112,14 +112,14 @@ percent = [.2 .4 .6 .8 1];
 mdotf = 14585 * percent;
 RPM = 9784;
 
-PNET = zeros(1,4); 
-mdotin = zeros(1,4);
-mdotout = zeros(1,4);
-nTH = zeros(1,4);
-T4 = zeros(1,4);
-T6 = zeros(1,4);
-SFC = zeros(1,4);
-HR = zeros(1,4);
+PNET = zeros(1,5); 
+mdotin = zeros(1,5);
+mdotout = zeros(1,5);
+nTH = zeros(1,5);
+T4 = zeros(1,5);
+T6 = zeros(1,5);
+SFC = zeros(1,5);
+HR = zeros(1,5);
 
 for i = 1:5
     [PNET(i), mdotin(i), mdotout(i), nTH(i), T4(i), T6(i), SFC(i), HR(i)] = phase1_calcs(nT1, nT2,T, mdotf(i), Vdot1b, RPM);
