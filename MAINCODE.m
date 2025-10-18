@@ -190,3 +190,7 @@ xlabel('% Base Case Fuel Rate')
 ylabel('HR [ BTU/kW-hr ]')
 title('Heat Rate vs Fuel Mass Flow Rate')
 grid on
+
+
+% set back to normal graph plotting
+set(groot, 'defaultFigureWindowState', 'normal');
