@@ -170,7 +170,7 @@ function [nT1, nT2, Vdot1] = phase1_basecase(TSplot)
     
 
     %% T–s diagram
-        
+    TSplot = 0;
     if TSplot == 1
         % Reference for real entropy change (TS (not taylor swift yet though :( ) diagram)
         sbref = 0;
