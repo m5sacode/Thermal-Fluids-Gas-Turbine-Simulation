@@ -43,7 +43,7 @@ figure
 subplot(2,3,1)
 plot(T, mdotin, '.-', MarkerSize = 20)
 hold on
-plot(T, mdotout, '.-', MarkerSize = 20)
+plot(T, mdotout, 'k.-', MarkerSize = 20)
 xlabel('T1 [ ^{\circ}F ]')
 ylabel('Mass Flow Rate [ lbm/hr ]')
 title('Mass Flow Rate vs Inlet Temperature')
@@ -54,7 +54,7 @@ grid on
 subplot(2,3,2)
 plot(T, T4, '.-', MarkerSize = 20)
 hold on
-plot(T, T6, '.-', MarkerSize = 20)
+plot(T, T6, 'k.-', MarkerSize = 20)
 xlabel('T1 [ ^{\circ}F ]')
 ylabel('T [ ^{\circ}F ]')
 title('Process Temperature vs Inlet Temperature')
@@ -118,7 +118,7 @@ figure
 subplot(2,3,1)
 plot(percent * 100, mdotin, '.-', MarkerSize = 20)
 hold on
-plot(percent * 100, mdotout, '.-', MarkerSize = 20)
+plot(percent * 100, mdotout, 'k.-', MarkerSize = 20)
 xlabel('% Base Case Fuel Rate')
 ylabel('Mass Flow Rate [ lbm/hr ]')
 title('Mass Flow Rate vs Fuel Mass Flow Rate')
@@ -129,7 +129,7 @@ grid on
 subplot(2,3,2)
 plot(percent * 100, T4, '.-', MarkerSize = 20)
 hold on
-plot(percent * 100, T6, '.-', MarkerSize = 20)
+plot(percent * 100, T6, 'k.-', MarkerSize = 20)
 xlabel('% Base Case Fuel Rate')
 ylabel('T4 [ ^{\circ}F ]')
 title('Process Temperature vs Fuel Mass Flow Rate')
