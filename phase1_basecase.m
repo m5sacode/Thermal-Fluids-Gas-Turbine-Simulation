@@ -170,7 +170,7 @@ function [nT1, nT2, Vdot1] = phase1_basecase(TSplot)
     
 
     %% T–s diagram
-    TSplot = 0;
+    % TSplot = 0;
     if TSplot == 1
         % Reference for real entropy change (TS (not taylor swift yet though :( ) diagram)
         sbref = 0;
@@ -212,7 +212,7 @@ function [nT1, nT2, Vdot1] = phase1_basecase(TSplot)
         
         xlabel('Specific Entropy s (kJ/kg-K)')
         ylabel('Temperature T (K)')
-        title('Gas Turbine T–s Diagram')
+        title('Gas Turbine T–s Diagram, Base Case')
         grid on
         
         % Label points

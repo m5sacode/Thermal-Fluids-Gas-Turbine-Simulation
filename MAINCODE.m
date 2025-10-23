@@ -19,12 +19,13 @@ O2hi = table2array(data(:,"O2hi"));
 O2so = table2array(data(:,"O2so"));
 
 %% gather base case info
-[nT1, nT2, Vdot1b] = phase1_basecase(0);
+[nT1, nT2, Vdot1b] = phase1_basecase(1);
 
 %% varying inlet temps
 T = [35 65 85 105];
 mdotf = [15981 14585 13518 12410];
 RPM = [9752 9784 9881 9974];
+
 PNET = zeros(1,4); 
 mdotin = zeros(1,4);
 mdotout = zeros(1,4);
@@ -35,7 +36,7 @@ SFC = zeros(1,4);
 HR = zeros(1,4);
 
 for i = 1:4
-    [PNET(i), mdotin(i), mdotout(i), nTH(i), T4(i), T6(i), SFC(i), HR(i)] = phase1_calcs(nT1, nT2,T(i), mdotf(i), Vdot1b, RPM(i));
+    [PNET(i), mdotin(i), mdotout(i), nTH(i), T4(i), T6(i), SFC(i), HR(i)] = phase1_calcs(nT1, nT2,T(i), mdotf(i), Vdot1b, RPM(i),0);
 end
 
 % mass flow rate
@@ -109,9 +110,27 @@ T6 = zeros(1,5);
 SFC = zeros(1,5);
 HR = zeros(1,5);
 
+figure('Name','Combined T–S Diagrams','Color','w');
+ax = gca;
+hold(ax, 'on');
+
+colors = lines(5);
+h = gobjects(1,5); % handles for legend entries
+
 for i = 1:5
-    [PNET(i), mdotin(i), mdotout(i), nTH(i), T4(i), T6(i), SFC(i), HR(i)] = phase1_calcs(nT1, nT2,T, mdotf(i), Vdot1b, RPM);
+    color = colors(i,:);
+    [PNET(i), mdotin(i), mdotout(i), nTH(i), T4(i), T6(i), SFC(i), HR(i), h(i)] = ...
+        phase1_calcs(nT1, nT2, T, mdotf(i), Vdot1b, RPM, ax);
 end
+
+legend(ax, h, 'Location','best');
+xlabel(ax, 'Specific Entropy s (kJ/kg·K)');
+ylabel(ax, 'Temperature T (K)');
+title(ax, 'Combined Gas Turbine T–S Diagrams');
+grid(ax, 'on');
+hold(ax, 'off');
+
+
 
 % mass flow rate
 figure
