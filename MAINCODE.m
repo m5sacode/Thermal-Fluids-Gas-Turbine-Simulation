@@ -39,6 +39,7 @@ for i = 1:4
     [PNET(i), mdotin(i), mdotout(i), nTH(i), T4(i), T6(i), SFC(i), HR(i)] = phase1_calcs(nT1, nT2,T(i), mdotf(i), Vdot1b, RPM(i),0);
 end
 
+
 % mass flow rate
 figure
 subplot(2,3,1)
@@ -129,7 +130,6 @@ ylabel(ax, 'Temperature T (K)');
 title(ax, 'Combined Gas Turbine T–S Diagrams');
 grid(ax, 'on');
 hold(ax, 'off');
-
 
 
 % mass flow rate
