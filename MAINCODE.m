@@ -46,7 +46,7 @@ hold on
 plot(T, mdotout, 'k.-', MarkerSize = 20)
 xlabel('T1 [ ^{\circ}F ]')
 ylabel('Mass Flow Rate [ lbm/hr ]')
-title('Mass Flow Rate vs Inlet Temperature')
+title('Inlet Mass Flow Rate vs Inlet Temperature')
 legend('Inlet','Outlet')
 grid on
 
@@ -121,7 +121,7 @@ hold on
 plot(percent * 100, mdotout, 'k.-', MarkerSize = 20)
 xlabel('% Base Case Fuel Rate')
 ylabel('Mass Flow Rate [ lbm/hr ]')
-title('Mass Flow Rate vs Fuel Mass Flow Rate')
+title('Inlet Mass Flow Rate vs Fuel Mass Flow Rate')
 legend('Inlet','Outlet')
 grid on
 
@@ -131,7 +131,7 @@ plot(percent * 100, T4, '.-', MarkerSize = 20)
 hold on
 plot(percent * 100, T6, 'k.-', MarkerSize = 20)
 xlabel('% Base Case Fuel Rate')
-ylabel('T4 [ ^{\circ}F ]')
+ylabel('T [ ^{\circ}F ]')
 title('Process Temperature vs Fuel Mass Flow Rate')
 legend('Turbine Intlet','Engine Outlet')
 grid on
