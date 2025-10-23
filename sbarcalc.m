@@ -2,4 +2,3 @@
 function sb = sbarcalc(T)
 
 sb = valInterp(T, 0);
-
