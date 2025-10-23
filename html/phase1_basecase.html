@@ -1,0 +1,653 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      -->
+<title>phase1_basecase</title>
+<meta name="generator" content="MATLAB 24.2">
+<link rel="schema.DC" href="http://purl.org/dc/elements/1.1/">
+<meta name="DC.date" content="2025-10-23">
+<meta name="DC.source" content="phase1_basecase.m">
+<style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; }
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+span.typesection { color:#A0522D }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style>
+</head>
+<body>
+<div class="content">
+<h2>Contents</h2>
+<div>
+<ul>
+<li>
+<a href="#1">UT Power Plant Gas Turbine Analysis Base Case (Phase 1)</a>
+</li>
+<li>
+<a href="#2">Set Up</a>
+</li>
+<li>
+<a href="#3">Input Operating Parameters</a>
+</li>
+<li>
+<a href="#4">Input Design Parameters</a>
+</li>
+<li>
+<a href="#5">Analysis</a>
+</li>
+<li>
+<a href="#6">Output Performance Parameters</a>
+</li>
+<li>
+<a href="#7">T&ndash;s diagram</a>
+</li>
+</ul>
+</div>
+<h2 id="1">UT Power Plant Gas Turbine Analysis Base Case (Phase 1)</h2>
+<p>assumptions: RH0 = 0%, fuel = natural gas, entire turbine is adiabatic</p>
+<p>sb =&gt; s bar hb =&gt; h bar</p>
+<pre class="codeinput">
+<span class="keyword">function</span> [nT1, nT2, Vdot1] = phase1_basecase(TSplot)
+</pre>
+<h2 id="2">Set Up</h2>
+<pre class="codeinput">    <span class="comment">% general constants</span>
+    Rbar = 8.314; <span class="comment">% kJ/kmol*K</span>
+    M = 28.02*.79 + 31.999*.21; <span class="comment">% kg/kmol</span>
+
+    <span class="comment">% conversion values</span>
+    psi2kPa = 6.895;
+    R2K = 5/9;
+    ft2m = 1/3.281;
+    inH2O2kPa = 1/4.019;
+    lb2kg = 1/2.205;
+    BTUlb2kJkg = 2.326;
+    hr2s = 3600;
+</pre>
+<h2 id="3">Input Operating Parameters</h2>
+<pre class="codeinput">    <span class="comment">% ambient air conditions</span>
+    p1 = 14.417 * psi2kPa; <span class="comment">% kPa</span>
+    T1 = (65 + 459.67) * R2K; <span class="comment">% K</span>
+
+    <span class="comment">% altitude (not used in phase 1)</span>
+    ALT = 530 * ft2m; <span class="comment">% m</span>
+
+    <span class="comment">% inlet air mass flow rate</span>
+    mdotin = 189.7 * lb2kg; <span class="comment">% kg/s</span>
+
+    <span class="comment">% inlet pressure loss</span>
+    delPin = 4 * inH2O2kPa; <span class="comment">% kPa</span>
+
+    <span class="comment">% exhaust pressure loss</span>
+    delPex = 10 * inH2O2kPa ; <span class="comment">% kPa</span>
+
+    <span class="comment">% lower heating value</span>
+    LHV = 19000 * BTUlb2kJkg; <span class="comment">% kJ/kg</span>
+
+    <span class="comment">% fuel mass flow rate</span>
+    mdotf = 14585 * lb2kg * 1/hr2s; <span class="comment">% kg/s</span>
+</pre>
+<h2 id="4">Input Design Parameters</h2>
+<pre class="codeinput">    <span class="comment">% compressor pressure ratios</span>
+    rLPC = 6;
+    rHPC = 4;
+
+    <span class="comment">% bypass air mass flow percent</span>
+    mBP = 0;
+
+    <span class="comment">% HP compressor parasitic bleed air mass flow percent</span>
+    mPB = 0;
+
+    <span class="comment">% compressor efficiencies (percent)</span>
+    nLPC = .82;
+    nHPC = .84;
+
+    <span class="comment">% turbine efficiencies (percent)</span>
+    <span class="comment">% nHPT =</span>
+    <span class="comment">% nLPT =</span>
+
+    <span class="comment">% generator efficiency (percent)</span>
+    nGEN = .977;
+
+    <span class="comment">% base case only</span>
+    p48 = 71 * psi2kPa; <span class="comment">% kPa</span>
+    WdotELEC = 30.607 * 1000; <span class="comment">% kW</span>
+</pre>
+<h2 id="5">Analysis</h2>
+<pre class="codeinput">    <span class="comment">% state 1</span>
+    v1 = (Rbar/M)*T1/p1;
+    Vdot1 = mdotin*v1;
+    sb1 = sbarcalc(T1);
+
+    <span class="comment">% state 1 -&gt; 2: guide vanes</span>
+    p2 = p1 - delPin;
+    T2 = T1;
+    hb2 = hbarcalc(T2);
+    h2 = hb2 / M;
+
+    <span class="comment">% state 2 -&gt; 25: LP compressor</span>
+    p25 = p2 * rLPC;
+    sb2 = sbarcalc(T2);
+    sb25s = sb2 + Rbar*log(p25/p2);
+    T25s = TcalcS(sb25s);
+    hb25s = hbarcalc(T25s);
+    h25s = hb25s / M;
+    h25 = h2 - (h2 - h25s)/nLPC;
+    hb25 = h25 * M;
+    T25 = TcalcH(hb25);
+    WdotC1 = mdotin*(h25-h2);
+
+    <span class="comment">% state 25 -&gt; 3: HP compressor</span>
+    p3 = p25 * rHPC;
+    sb25 = sbarcalc(T25);
+    sb3s = sb25 + Rbar*log(p3/p25);
+    T3s = TcalcS(sb3s);
+    hb3s = hbarcalc(T3s);
+    h3s = hb3s / M;
+    h3 = h25 - (h25 - h3s)/nHPC;
+    hb3 = h3 * M;
+    T3 = TcalcH(hb3);
+    sb3 = sbarcalc(T3);
+    WdotC2 = mdotin*(h3-h25);
+
+    <span class="comment">% state 3 -&gt; 4: combustor</span>
+    mdot4 = mdotin + mdotf;
+    Qdot = mdotf * LHV;
+    h4 = (Qdot + mdotin*h3)/mdot4;
+    hb4 = h4 * M;
+    T4 = TcalcH(hb4);
+    sb4 = sbarcalc(T4);
+    p4 = p3;
+
+    <span class="comment">% state 4 -&gt; 48: HP turbine</span>
+    WdotT1 = WdotC1 + WdotC2;
+    h48 = h4 - (WdotT1/mdot4);
+    hb48 = h48 * M;
+    T48 = TcalcH(hb48);
+    sb48 = sbarcalc(T48);
+    sb48s = sb4 + Rbar*log(p48/p4);
+    T48s = TcalcS(sb48s);
+    hb48s = hbarcalc(T48s);
+    h48s = hb48s / M;
+    nT1 = (h4-h48)/(h4-h48s);
+
+    <span class="comment">% state 48 -&gt; 5: LP turbine</span>
+    h5 = h48 - (WdotELEC/nGEN)/mdot4;
+    hb5 = h5 * M;
+    T5 = TcalcH(hb5);
+    sb5 = sbarcalc(T5);
+    p5 = p1 + delPex;
+    sb5s = sb48 + Rbar*log(p5/p48);
+    T5s = TcalcS(sb5s);
+    hb5s = hbarcalc(T5s);
+    h5s = hb5s / M;
+    nT2 = (h48-h5)/(h48-h5s);
+
+    <span class="comment">% state 6: after nozzle</span>
+    p6 = p1;
+    T6 = T5;
+    sb6 = sbarcalc(T6);
+</pre>
+<h2 id="6">Output Performance Parameters</h2>
+<p>table of T and p at each station, vol. flow rate at inlet,</p>
+<pre class="codeinput">    states = [1 2 25 3 4 48 5 6]';
+    allT = 1/R2K*[T1 T2 T25 T3 T4 T48 T5 T6]';
+    allp = 1/psi2kPa*[p1 p2 p25 p3 p4 p48 p5 p6]';
+
+    data = [states allT, allp];
+
+    BaseCaseStates = array2table(data, <span class="string">"VariableNames"</span>, [<span class="string">"state"</span>, <span class="string">"temp (K)"</span>, <span class="string">"pressure (kPa)"</span>])
+
+    <span class="comment">% turbine efficiencies</span>
+    nT1
+    nT2
+</pre>
+<h2 id="7">T&ndash;s diagram</h2>
+<p>TSplot = 0;</p>
+<pre class="codeinput">    <span class="keyword">if</span> TSplot == 1
+        <span class="comment">% Reference for real entropy change (TS (not taylor swift yet though :( ) diagram)</span>
+        sbref = 0;
+
+        <span class="comment">% calculate specific entropies</span>
+        sb1r = sbref;
+        sb2r = sb1r + sb2 - sb1 - Rbar*log(p2/p1);
+        sb25r = sb2r + sb25 - sb2 - Rbar*log(p25/p2);
+        sb25rs = sb2r + sb25s - sb2 - Rbar*log(p25/p2);
+        sb3rs = sb25r + sb3s - sb25 - Rbar*log(p3/p25);
+        sb3r = sb25r + sb3 - sb25 - Rbar*log(p3/p25);
+        sb4r = sb3r + sb4 - sb3 - Rbar*log(p4/p3);
+        sb48r = sb4r + sb48 - sb4 - Rbar*log(p48/p4);
+        sb48rs = sb4r + sb48s - sb4 - Rbar*log(p48/p4);
+        sb5r = sb48r + sb5 - sb48 - Rbar*log(p5/p48);
+        sb5rs = sb48r;
+        sb6r = sb5r + sb6 - sb5 - Rbar*log(p6/p5);
+
+
+        <span class="comment">% Collect specific entropies (kJ/kg-K). Divide s̄ (kJ/kmol-K) by M (kg/kmol).</span>
+        allS = [ <span class="keyword">...</span>
+            sb1r/M
+            sb2r/M
+            sb25r/M
+            sb3r/M
+            sb4r/M
+            sb48r/M
+            sb5r/M
+            sb6r/M];
+
+        figure
+        hold <span class="string">on</span>
+
+        <span class="comment">% Plot 1&ndash;2&ndash;25&ndash;3</span>
+        plot(allS(1:4), [T1 T2 T25 T3], <span class="string">'o-b'</span>, <span class="string">'LineWidth'</span>, 1, <span class="string">'MarkerSize'</span>, 6)
+
+        <span class="comment">% Plot 4&ndash;48&ndash;5-6 separately</span>
+        plot(allS(5:8), [T4 T48 T5 T6], <span class="string">'o-b'</span>, <span class="string">'LineWidth'</span>, 1, <span class="string">'MarkerSize'</span>, 6)
+
+        xlabel(<span class="string">'Specific Entropy s (kJ/kg-K)'</span>)
+        ylabel(<span class="string">'Temperature T (K)'</span>)
+        title(<span class="string">'Gas Turbine T&ndash;s Diagram, Base Case'</span>)
+        grid <span class="string">on</span>
+
+        <span class="comment">% Label points</span>
+        text(allS, [T1 T2 T25 T3 T4 T48 T5 T6], string(states), <span class="keyword">...</span>
+            <span class="string">'VerticalAlignment'</span>,<span class="string">'bottom'</span>,<span class="string">'HorizontalAlignment'</span>,<span class="string">'right'</span>)
+
+        <span class="comment">% --- add isentropic points</span>
+        S_iso = [sb25rs/M, sb3rs/M, sb48rs/M, sb5rs/M];
+        T_iso = [T25s,     T3s,     T48s,    T5s];
+        labels_iso = {<span class="string">'25s'</span>,<span class="string">'3s'</span>,<span class="string">'48s'</span>,<span class="string">'5s'</span>};
+
+        hold <span class="string">on</span>
+        scatter(S_iso, T_iso, 60, [0.5 0.5 0.5], <span class="string">'x'</span>, <span class="string">'LineWidth'</span>, 1.5)
+
+        <span class="comment">% annotate isentropic points</span>
+        text(S_iso, T_iso, labels_iso, <span class="keyword">...</span>
+            <span class="string">'VerticalAlignment'</span>,<span class="string">'top'</span>, <span class="string">'HorizontalAlignment'</span>,<span class="string">'left'</span>, <span class="keyword">...</span>
+            <span class="string">'Color'</span>, [0.5 0.5 0.5],<span class="string">'FontSize'</span>,6)
+
+        <span class="comment">% --- define turbine inlets and connect to isentropic outlets</span>
+        S_in   = [sb2r/M, sb25r/M, sb4r/M, sb48r/M];   <span class="comment">% entropy at turbine inlets</span>
+        T_in   = [T2,     T25,     T4,     T48];       <span class="comment">% turbine inlet temperatures</span>
+
+        <span class="keyword">for</span> k = 1:length(S_iso)
+            plot([S_iso(k) S_iso(k)], [T_in(k) T_iso(k)], <span class="keyword">...</span>
+                 <span class="string">'--'</span>, <span class="string">'Color'</span>, [0.5 0.5 0.5], <span class="string">'LineWidth'</span>, 0.8)
+        <span class="keyword">end</span>
+
+        <span class="comment">% Pressures to plot</span>
+        <span class="comment">% p_iso = [p1 p2 p25 p3 p4 p48 p5];</span>
+        <span class="comment">% colors = lines(length(p_iso));</span>
+
+        <span class="comment">% for k = 1:length(p_iso)</span>
+        <span class="comment">%     iso_curve = ts_isobar(p_iso(k), T1, 2000, p1, Rbar, T1);</span>
+        <span class="comment">%     plot(iso_curve(:,1)/M, iso_curve(:,2), '--', 'Color', [0.5 0.5 0.5], 'LineWidth', 1)</span>
+        <span class="comment">% end</span>
+
+        iso_curve_25s_25 = ts_isobar(p25, T1, T25, p1, Rbar, T25s);
+        plot(iso_curve_25s_25(:,1)/M, iso_curve_25s_25(:,2), <span class="string">'--'</span>, <span class="string">'Color'</span>, [0.5 0.5 0.5], <span class="string">'LineWidth'</span>, 1)
+
+        iso_curve_3s_3 = ts_isobar(p3, T1, T3, p1, Rbar, T3s);
+        plot(iso_curve_3s_3(:,1)/M, iso_curve_3s_3(:,2), <span class="string">'--'</span>, <span class="string">'Color'</span>, [0.5 0.5 0.5], <span class="string">'LineWidth'</span>, 1)
+
+        iso_curve_3_4 = ts_isobar(p3, T1, T4, p1, Rbar, T3);
+        plot(iso_curve_3_4(:,1)/M, iso_curve_3_4(:,2), <span class="string">'-'</span>, <span class="string">'Color'</span>, [0 0 1], <span class="string">'LineWidth'</span>, 1)
+
+        iso_curve_48s_48 = ts_isobar(p48, T1, T48, p1, Rbar, T48s);
+        plot(iso_curve_48s_48(:,1)/M, iso_curve_48s_48(:,2), <span class="string">'--'</span>, <span class="string">'Color'</span>, [0.5 0.5 0.5], <span class="string">'LineWidth'</span>, 1)
+
+        iso_curve_5s_5 = ts_isobar(p5, T1, T5, p1, Rbar, T5s);
+        plot(iso_curve_5s_5(:,1)/M, iso_curve_5s_5(:,2), <span class="string">'--'</span>, <span class="string">'Color'</span>, [0.5 0.5 0.5], <span class="string">'LineWidth'</span>, 1)
+
+        iso_curve_1_6 = ts_isobar(p6, T1, T6, p1, Rbar, T1);
+        plot(iso_curve_1_6(:,1)/M, iso_curve_1_6(:,2), <span class="string">'--'</span>, <span class="string">'Color'</span>, [0 0 1], <span class="string">'LineWidth'</span>, 1)
+
+        hold <span class="string">off</span>
+    <span class="keyword">end</span>
+</pre>
+<pre class="codeinput">
+<span class="keyword">end</span>
+</pre>
+<p class="footer">
+<br>
+<a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2024b</a>
+<br>
+</p>
+</div>
+<!--
+##### SOURCE BEGIN #####
+%% UT Power Plant Gas Turbine Analysis Base Case (Phase 1)
+%
+% assumptions: RH0 = 0%, fuel = natural gas, entire turbine is adiabatic
+%
+% sb => s bar
+% hb => h bar
+%
+% 
+
+function [nT1, nT2, Vdot1] = phase1_basecase(TSplot)
+    %% Set Up
+    
+    % general constants
+    Rbar = 8.314; % kJ/kmol*K
+    M = 28.02*.79 + 31.999*.21; % kg/kmol
+    
+    % conversion values
+    psi2kPa = 6.895;
+    R2K = 5/9;
+    ft2m = 1/3.281;
+    inH2O2kPa = 1/4.019;
+    lb2kg = 1/2.205;
+    BTUlb2kJkg = 2.326;
+    hr2s = 3600;
+    
+    %% Input Operating Parameters
+    
+    % ambient air conditions
+    p1 = 14.417 * psi2kPa; % kPa
+    T1 = (65 + 459.67) * R2K; % K
+    
+    % altitude (not used in phase 1)
+    ALT = 530 * ft2m; % m
+    
+    % inlet air mass flow rate
+    mdotin = 189.7 * lb2kg; % kg/s
+    
+    % inlet pressure loss
+    delPin = 4 * inH2O2kPa; % kPa
+    
+    % exhaust pressure loss
+    delPex = 10 * inH2O2kPa ; % kPa
+    
+    % lower heating value
+    LHV = 19000 * BTUlb2kJkg; % kJ/kg
+    
+    % fuel mass flow rate
+    mdotf = 14585 * lb2kg * 1/hr2s; % kg/s
+    
+    
+    %% Input Design Parameters
+    
+    % compressor pressure ratios
+    rLPC = 6;
+    rHPC = 4;
+    
+    % bypass air mass flow percent
+    mBP = 0;
+    
+    % HP compressor parasitic bleed air mass flow percent
+    mPB = 0;
+    
+    % compressor efficiencies (percent)
+    nLPC = .82;
+    nHPC = .84;
+    
+    % turbine efficiencies (percent)
+    % nHPT =
+    % nLPT =
+    
+    % generator efficiency (percent)
+    nGEN = .977;
+    
+    % base case only
+    p48 = 71 * psi2kPa; % kPa
+    WdotELEC = 30.607 * 1000; % kW
+    
+
+    %% Analysis
+    
+    % state 1
+    v1 = (Rbar/M)*T1/p1;
+    Vdot1 = mdotin*v1;
+    sb1 = sbarcalc(T1);
+    
+    % state 1 -> 2: guide vanes
+    p2 = p1 - delPin;
+    T2 = T1;
+    hb2 = hbarcalc(T2);
+    h2 = hb2 / M;
+    
+    % state 2 -> 25: LP compressor
+    p25 = p2 * rLPC;
+    sb2 = sbarcalc(T2);
+    sb25s = sb2 + Rbar*log(p25/p2);
+    T25s = TcalcS(sb25s);
+    hb25s = hbarcalc(T25s);
+    h25s = hb25s / M;
+    h25 = h2 - (h2 - h25s)/nLPC;
+    hb25 = h25 * M;
+    T25 = TcalcH(hb25);
+    WdotC1 = mdotin*(h25-h2);
+    
+    % state 25 -> 3: HP compressor
+    p3 = p25 * rHPC;
+    sb25 = sbarcalc(T25);
+    sb3s = sb25 + Rbar*log(p3/p25);
+    T3s = TcalcS(sb3s);
+    hb3s = hbarcalc(T3s);
+    h3s = hb3s / M;
+    h3 = h25 - (h25 - h3s)/nHPC;
+    hb3 = h3 * M;
+    T3 = TcalcH(hb3);
+    sb3 = sbarcalc(T3);
+    WdotC2 = mdotin*(h3-h25);
+    
+    % state 3 -> 4: combustor
+    mdot4 = mdotin + mdotf;
+    Qdot = mdotf * LHV;
+    h4 = (Qdot + mdotin*h3)/mdot4;
+    hb4 = h4 * M;
+    T4 = TcalcH(hb4);
+    sb4 = sbarcalc(T4);
+    p4 = p3;
+    
+    % state 4 -> 48: HP turbine
+    WdotT1 = WdotC1 + WdotC2;
+    h48 = h4 - (WdotT1/mdot4);
+    hb48 = h48 * M;
+    T48 = TcalcH(hb48);
+    sb48 = sbarcalc(T48);
+    sb48s = sb4 + Rbar*log(p48/p4);
+    T48s = TcalcS(sb48s);
+    hb48s = hbarcalc(T48s);
+    h48s = hb48s / M;
+    nT1 = (h4-h48)/(h4-h48s);
+    
+    % state 48 -> 5: LP turbine
+    h5 = h48 - (WdotELEC/nGEN)/mdot4;
+    hb5 = h5 * M;
+    T5 = TcalcH(hb5);
+    sb5 = sbarcalc(T5);
+    p5 = p1 + delPex;
+    sb5s = sb48 + Rbar*log(p5/p48); 
+    T5s = TcalcS(sb5s);
+    hb5s = hbarcalc(T5s);
+    h5s = hb5s / M;
+    nT2 = (h48-h5)/(h48-h5s);
+    
+    % state 6: after nozzle
+    p6 = p1;
+    T6 = T5;
+    sb6 = sbarcalc(T6);
+    
+    
+    %% Output Performance Parameters
+    % table of T and p at each station, vol. flow rate at inlet, 
+    
+    states = [1 2 25 3 4 48 5 6]';
+    allT = 1/R2K*[T1 T2 T25 T3 T4 T48 T5 T6]';
+    allp = 1/psi2kPa*[p1 p2 p25 p3 p4 p48 p5 p6]';
+    
+    data = [states allT, allp];
+    
+    BaseCaseStates = array2table(data, "VariableNames", ["state", "temp (K)", "pressure (kPa)"])
+    
+    % turbine efficiencies
+    nT1
+    nT2
+    
+
+    %% T–s diagram
+    % TSplot = 0;
+    if TSplot == 1
+        % Reference for real entropy change (TS (not taylor swift yet though :( ) diagram)
+        sbref = 0;
+        
+        % calculate specific entropies
+        sb1r = sbref;
+        sb2r = sb1r + sb2 - sb1 - Rbar*log(p2/p1);
+        sb25r = sb2r + sb25 - sb2 - Rbar*log(p25/p2);
+        sb25rs = sb2r + sb25s - sb2 - Rbar*log(p25/p2);
+        sb3rs = sb25r + sb3s - sb25 - Rbar*log(p3/p25);
+        sb3r = sb25r + sb3 - sb25 - Rbar*log(p3/p25);
+        sb4r = sb3r + sb4 - sb3 - Rbar*log(p4/p3);
+        sb48r = sb4r + sb48 - sb4 - Rbar*log(p48/p4);
+        sb48rs = sb4r + sb48s - sb4 - Rbar*log(p48/p4);
+        sb5r = sb48r + sb5 - sb48 - Rbar*log(p5/p48);
+        sb5rs = sb48r;
+        sb6r = sb5r + sb6 - sb5 - Rbar*log(p6/p5);
+    
+    
+        % Collect specific entropies (kJ/kg-K). Divide s̄ (kJ/kmol-K) by M (kg/kmol).
+        allS = [ ...
+            sb1r/M
+            sb2r/M
+            sb25r/M
+            sb3r/M
+            sb4r/M
+            sb48r/M
+            sb5r/M
+            sb6r/M];
+        
+        figure
+        hold on
+        
+        % Plot 1–2–25–3
+        plot(allS(1:4), [T1 T2 T25 T3], 'o-b', 'LineWidth', 1, 'MarkerSize', 6)
+        
+        % Plot 4–48–5-6 separately
+        plot(allS(5:8), [T4 T48 T5 T6], 'o-b', 'LineWidth', 1, 'MarkerSize', 6)
+        
+        xlabel('Specific Entropy s (kJ/kg-K)')
+        ylabel('Temperature T (K)')
+        title('Gas Turbine T–s Diagram, Base Case')
+        grid on
+        
+        % Label points
+        text(allS, [T1 T2 T25 T3 T4 T48 T5 T6], string(states), ...
+            'VerticalAlignment','bottom','HorizontalAlignment','right')
+        
+        % REPLACE_WITH_DASH_DASH- add isentropic points
+        S_iso = [sb25rs/M, sb3rs/M, sb48rs/M, sb5rs/M];
+        T_iso = [T25s,     T3s,     T48s,    T5s];
+        labels_iso = {'25s','3s','48s','5s'};
+        
+        hold on
+        scatter(S_iso, T_iso, 60, [0.5 0.5 0.5], 'x', 'LineWidth', 1.5)
+        
+        % annotate isentropic points
+        text(S_iso, T_iso, labels_iso, ...
+            'VerticalAlignment','top', 'HorizontalAlignment','left', ...
+            'Color', [0.5 0.5 0.5],'FontSize',6)
+        
+        % REPLACE_WITH_DASH_DASH- define turbine inlets and connect to isentropic outlets
+        S_in   = [sb2r/M, sb25r/M, sb4r/M, sb48r/M];   % entropy at turbine inlets
+        T_in   = [T2,     T25,     T4,     T48];       % turbine inlet temperatures
+        
+        for k = 1:length(S_iso)
+            plot([S_iso(k) S_iso(k)], [T_in(k) T_iso(k)], ...
+                 'REPLACE_WITH_DASH_DASH', 'Color', [0.5 0.5 0.5], 'LineWidth', 0.8)
+        end
+        
+        % Pressures to plot
+        % p_iso = [p1 p2 p25 p3 p4 p48 p5];
+        % colors = lines(length(p_iso));
+        
+        % for k = 1:length(p_iso)
+        %     iso_curve = ts_isobar(p_iso(k), T1, 2000, p1, Rbar, T1); 
+        %     plot(iso_curve(:,1)/M, iso_curve(:,2), 'REPLACE_WITH_DASH_DASH', 'Color', [0.5 0.5 0.5], 'LineWidth', 1)
+        % end
+        
+        iso_curve_25s_25 = ts_isobar(p25, T1, T25, p1, Rbar, T25s);
+        plot(iso_curve_25s_25(:,1)/M, iso_curve_25s_25(:,2), 'REPLACE_WITH_DASH_DASH', 'Color', [0.5 0.5 0.5], 'LineWidth', 1)
+        
+        iso_curve_3s_3 = ts_isobar(p3, T1, T3, p1, Rbar, T3s);
+        plot(iso_curve_3s_3(:,1)/M, iso_curve_3s_3(:,2), 'REPLACE_WITH_DASH_DASH', 'Color', [0.5 0.5 0.5], 'LineWidth', 1)
+        
+        iso_curve_3_4 = ts_isobar(p3, T1, T4, p1, Rbar, T3);
+        plot(iso_curve_3_4(:,1)/M, iso_curve_3_4(:,2), '-', 'Color', [0 0 1], 'LineWidth', 1)
+        
+        iso_curve_48s_48 = ts_isobar(p48, T1, T48, p1, Rbar, T48s);
+        plot(iso_curve_48s_48(:,1)/M, iso_curve_48s_48(:,2), 'REPLACE_WITH_DASH_DASH', 'Color', [0.5 0.5 0.5], 'LineWidth', 1)
+        
+        iso_curve_5s_5 = ts_isobar(p5, T1, T5, p1, Rbar, T5s);
+        plot(iso_curve_5s_5(:,1)/M, iso_curve_5s_5(:,2), 'REPLACE_WITH_DASH_DASH', 'Color', [0.5 0.5 0.5], 'LineWidth', 1)
+        
+        iso_curve_1_6 = ts_isobar(p6, T1, T6, p1, Rbar, T1);
+        plot(iso_curve_1_6(:,1)/M, iso_curve_1_6(:,2), 'REPLACE_WITH_DASH_DASH', 'Color', [0 0 1], 'LineWidth', 1)
+        
+        hold off
+    end
+
+end
+##### SOURCE END #####
+-->
+</body>
+</html>
