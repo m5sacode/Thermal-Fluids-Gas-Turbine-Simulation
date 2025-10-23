@@ -4,8 +4,8 @@
 function T = TcalcS(sb)
 
 err = 1;
-Tmin = 250;
-Tmax = 3200;
+Tmin = 0;
+Tmax = 3250;
 
 while err > 1e-3
     T = (Tmin+Tmax)/2;
