@@ -161,6 +161,7 @@ function [PNET, mdotin, mdotout, nTH, Tturb, Teng, SFC, HR] = phase1_calcs(nT1, 
     nTH = WdotELEC/Qdot;
     SFC = mdotf/WdotELEC * 1/lb2kg * hr2s; 
     HR = SFC*LHV * 1/BTUlb2kJkg;
+    
     %% T–s diagram
     TSplot = 0;
     if TSplot == 1

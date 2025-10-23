@@ -180,7 +180,7 @@ grid on
 
 % heat rate
 subplot(2,1,2)
-plot(percent(:,2:end) * 100, HR(:,2:end), '.-', MarkerSize = 20)
+plot(percent(:,2:end) * 100, HR(2:end,:), '.-', MarkerSize = 20)
 xlabel('% Base Case Fuel Rate')
 ylabel('HR [ BTU/kW-hr ]')
 title('Heat Rate vs Fuel Mass Flow Rate')
