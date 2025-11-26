@@ -162,7 +162,7 @@ function [nT1, nT2, Vdot1] = phase1_basecase(TSplot)
     
     data = [states allT, allp];
     
-    BaseCaseStates = array2table(data, "VariableNames", ["state", "temp (K)", "pressure (kPa)"])
+    BaseCaseStates = array2table(data, "VariableNames", ["state", "temp (R)", "pressure (psi)"])
     
     % turbine efficiencies
     nT1
