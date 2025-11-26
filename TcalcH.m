@@ -1,5 +1,5 @@
 %% calculate T given h bar
-% works for temperatures between 300K, 3000K
+% works for temperatures between 250K, 3200K
 
 function T = TcalcH(hb)
 

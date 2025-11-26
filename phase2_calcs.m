@@ -9,10 +9,14 @@
 
 function [PNET, mdotin, mdotout, nTH, Tturb, Teng, SFC, HR, hMain] = phase2_calcs(nT1, nT2, Tin, mdotf, Vdot1b, RPM, table, TSplot)
     %% Set Up
-    
+
+    global yN2 yO2
+
     % general constants
     Rbar = 8.314; % kJ/kmol*K
-    Mair = 28.02*.79 + 31.999*.21; % kg/kmol
+    Mair = 28.02*yN2 + 31.999*yO2; % kg/kmol
+    Mh2o = 18.01;
+    
 
     % conversion values
     psi2kPa = 6.895;
@@ -89,25 +93,37 @@ function [PNET, mdotin, mdotout, nTH, Tturb, Teng, SFC, HR, hMain] = phase2_calc
     sb1 = sbarcalc(T1);
     
     % state 1 -> 2: evaporative cooler
-    
-
+    p2 = p1; %%% CHECK THIS
+    RH2 = 1;
+    ha1 = hcalc(T1,yO2,yN2,0,0,Mair);
+    hv1 = hcalc(T1,0,0,1,0,Mh2o);
+    w1 = wcalc(RH1,p1,T1);
+    H1 = ha1 + w1*hv1;
     err = 1;
-    
-    Tmin = 250;
-    Tmax = 3200;
-    
+    Tmin = 271.01;
+    Tmax = 633;
     while err > 1e-3
-        T = (Tmin+Tmax)/2;
-        hcalc = valInterp(T, 1);
-        
+        T2 = (Tmin+Tmax)/2;
+        ha2 = hcalc(T2,yO2,yN2,0,0,Mair);
+        hv2 = hcalc(T2,0,0,1,0,Mh2o);
+        w2 = wcalc(RH2,p2,T2);
+        H2 = ha2 + w2*hv2;
         err = abs(H1-H2);
-        if hb > hcalc
-            Tmin = T;
-        elseif hb < hcalc
-            Tmax = T;
+        if H1 > H2
+            Tmin = T2;
+        elseif H1 < H2
+            Tmax = T2;
         end    
     end
-    
+    Vdot2 = Vdot0;
+    ndot2 = (p2*Vdot2)/(Rbar*T2);
+    ndota = ndot2/(1+w2*(Mair/Mh2o));
+    ndotv2 = ndot2-ndota;
+    mdotv2 = ndotv2*Mh2o;
+    mdota = ndota*Mair;
+    mdotv1 = w1*mdota;
+    mdotl = mdotv2-mdotv1;
+
     % state 2 -> 25: LP compressor
     p25 = p2 * rLPC;
     sb2 = sbarcalc(T2);
