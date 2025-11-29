@@ -94,10 +94,10 @@ end
 
 % Plot vs To - Generator output Wdotgen for 1 and 2 along with measured values (MW)
 figure
-plot(T_1, PNET_1)
+plot(T_1, PNET_1, '.-', MarkerSize = 20)
 hold on
-plot(T_2, PNET_2)
-xlabel('Temperature [\deg F]')
+plot(T_2, PNET_2, '.-', MarkerSize = 20)
+xlabel('Temperature [^{\circ}F]')
 ylabel('Generator Output [MW]')
 ylim([0 40])
 legend('Phase 1','Phase 2','Measured Values')
@@ -106,14 +106,41 @@ title('Generator Output Comparison')
 % Plot vs To - Inlet mass flow rate and fuel mass flow rate for 1 and 2, two y axis (lbm/h) 
 
 
-% Plot vs To - T4 for 1 and 2, phase 2 equiv ratio
+%% Plot vs To - T4 for 1 and 2, phase 2 equiv ratio
+figure
+plot(T_1, T4_1, '.-', MarkerSize = 20)
+hold on
+plot(T_2, T4_2, '.-', MarkerSize = 20)
+xlabel('Temperature [^{\circ}F]')
+ylabel('T4 [^{\circ}F]')
+ylim([0 2500])
+legend('Phase 1','Phase 2','Phase 2 Equivalence Ratio')
+title('Temperature at Stage 4 and Equivalence Ratio')
 
+%% Plot vs To - T25,3,4,48,6 for phase 2 and T3,48,6 from data
+figure
+plot(T_2, T25_2, '.-', MarkerSize = 20)
+hold on
+plot(T_2, T3_2, '.-', MarkerSize = 20)
+plot(T_2, T4_2, '.-', MarkerSize = 20)
+plot(T_2, T48_2, '.-', MarkerSize = 20)
+plot(T_2, T6_2, '.-', MarkerSize = 20)
+xlabel('Temperature [^{\circ}F]')
+ylabel('Temperature [^{\circ}F]')
+ylim([0 2500])
+legend('Phase 2 T25','Phase 2 T3','Phase 2 T4','Phase 2 T48','Phase 2 T6')
+title('Stage Temperature Comparison')
 
-% Plot vs To - T25,3,4,48,6 for phase 2 and T3,48,6 from data
-
-
-% Plot vs To - Thermal efficiencies nTH for 1 and 2
-
+%% Plot vs To - Thermal efficiencies nTH for 1 and 2
+figure
+plot(T_1, nTH_1, '.-', MarkerSize = 20)
+hold on
+plot(T_2, nTH_2, '.-', MarkerSize = 20)
+xlabel('Temperature [^{\circ}F]')
+ylabel('nTH')
+% ylim([0 2500])
+legend('Phase 1','Phase 2')
+title('Thermal Efficiency Comparison')
 
 % Plot vs To - SFC (lbm/kWh) and HR (BTU/kWh), two y axis
 
@@ -124,8 +151,19 @@ title('Generator Output Comparison')
 % Plot vs %m - Thermal Efficiencies nTH and T4
 
 
-% Plot vs %m - T25, T3, T4, T48, T6
-
+%% Plot vs %m - T25, T3, T4, T48, T6
+figure
+plot(percent*100, T25_m, '.-', MarkerSize = 20)
+hold on
+plot(percent*100, T3_m, '.-', MarkerSize = 20)
+plot(percent*100, T4_m, '.-', MarkerSize = 20)
+plot(percent*100, T48_m, '.-', MarkerSize = 20)
+plot(percent*100, T6_m, '.-', MarkerSize = 20)
+xlabel('Temperature [^{\circ}F]')
+ylabel('Temperature [^{\circ}F]')
+ylim([0 2500])
+legend('Phase 2 T25','Phase 2 T3','Phase 2 T4','Phase 2 T48','Phase 2 T6')
+title('Stage Temperature Comparison for Differing Mass Flow Rate Percentages')
 
 % Plot vs To - Wdotgen with and without evap cool
 

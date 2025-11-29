@@ -30,7 +30,7 @@ press = table2array(data2(:,"PresskPa"));
 
 %% varying inlet temps phase 1
 T_1 = [35 65 85 105];
-mdotf = [15981 14585 13518 12410];
+mdotf_1 = [15981 14585 13518 12410];
 RPM = [9752 9784 9881 9974];
 
 PNET_1 = zeros(1,4); 
@@ -43,12 +43,12 @@ SFC_1 = zeros(1,4);
 HR_1 = zeros(1,4);
 
 for i = 1:4
-    [PNET_1(i), mdotin_1(i), mdotout_1(i), nTH_1(i), T4_1(i), T6_1(i), SFC_1(i), HR_1(i)] = phase1_calcs(nT1, nT2, T_1(i), mdotf(i), Vdot1b, RPM(i),0);
+    [PNET_1(i), mdotin_1(i), mdotout_1(i), nTH_1(i), T4_1(i), T6_1(i), SFC_1(i), HR_1(i)] = phase1_calcs(nT1, nT2, T_1(i), mdotf_1(i), Vdot1b, RPM(i),0);
 end
 
 %% varying inlet temps phase 2
 T_2 = [35 65 85 105];
-mdotf = [15981 14585 13518 12410];
+mdotf_2 = [15981 14585 13518 12410];
 RPM = [9752 9784 9881 9974];
 
 PNET_2 = zeros(1,4); 
@@ -64,7 +64,7 @@ SFC_2 = zeros(1,4);
 HR_2 = zeros(1,4);
 
 for i = 1:4
-    [PNET_2(i), mdotin_2(i), mdotout_2(i), nTH_2(i), T25_2(i), T3_2(i), T4_2(i), T48_2(i), T6_2(i), SFC_2(i), HR_2(i)] = phase2_calcs(nT1, nT2, T_2(i), mdotf(i), Vdot1b, RPM(i), 0, 0);
+    [PNET_2(i), mdotin_2(i), mdotout_2(i), nTH_2(i), T25_2(i), T3_2(i), T4_2(i), T48_2(i), T6_2(i), SFC_2(i), HR_2(i)] = phase2_calcs(nT1, nT2, T_2(i), mdotf_2(i), Vdot1b, RPM(i), 0, 0);
 end
 
 %% varying % mass flow rate
@@ -103,8 +103,23 @@ ylim([0 40])
 legend('Phase 1','Phase 2','Measured Values')
 title('Generator Output Comparison')
 
-% Plot vs To - Inlet mass flow rate and fuel mass flow rate for 1 and 2, two y axis (lbm/h) 
+%% Plot vs To - Inlet mass flow rate and fuel mass flow rate for 1 and 2, two y axis (lbm/h) 
+figure
 
+yyaxis left
+a1 = plot(T_1, mdotin_1, '.-', MarkerSize = 20);
+hold on
+ylabel('Inlet Mass Flow Rate [lbm/h]')
+ylim([0 7.3E5])
+
+yyaxis right
+a2 = plot(T_1, mdotf_1, '.-', MarkerSize = 20);
+hold on
+ylabel('Fuel Mass Flow Rate [lbm/h]')
+ylim([0 1.65E4])
+
+legend([a1 a2],{'Inlet','Fuel'}, Location = 'southeast')
+title('Mass Flow Rate Comparison')
 
 %% Plot vs To - T4 for 1 and 2, phase 2 equiv ratio
 figure
@@ -138,12 +153,15 @@ hold on
 plot(T_2, nTH_2, '.-', MarkerSize = 20)
 xlabel('Temperature [^{\circ}F]')
 ylabel('nTH')
-% ylim([0 2500])
-legend('Phase 1','Phase 2')
+ylim([0 .4])
+legend('Phase 1','Phase 2', Location = 'southeast')
 title('Thermal Efficiency Comparison')
 
-% Plot vs To - SFC (lbm/kWh) and HR (BTU/kWh), two y axis
-
+%% Plot vs To - SFC (lbm/kWh) and HR (BTU/kWh), two y axis
+figure
+yyaxis left
+plot()
+hold on 
 
 % Plot vs %m - Generator output and turbine work ratio
 
@@ -151,8 +169,19 @@ title('Thermal Efficiency Comparison')
 % Plot vs %m - Thermal Efficiencies nTH and T4
 
 
-% Plot vs %m - T25, T3, T4, T48, T6
-
+%% Plot vs %m - T25, T3, T4, T48, T6
+figure
+plot(percent*100, T25_m, '.-', MarkerSize = 20)
+hold on
+plot(percent*100, T3_m, '.-', MarkerSize = 20)
+plot(percent*100, T4_m, '.-', MarkerSize = 20)
+plot(percent*100, T48_m, '.-', MarkerSize = 20)
+plot(percent*100, T6_m, '.-', MarkerSize = 20)
+xlabel('Temperature [^{\circ}F]')
+ylabel('Temperature [^{\circ}F]')
+ylim([0 2500])
+legend('T25','T3','T4','T48','T6')
+title('Stage Temperature Comparison for Differing Mass Flow Rate Percentages')
 
 % Plot vs To - Wdotgen with and without evap cool
 
