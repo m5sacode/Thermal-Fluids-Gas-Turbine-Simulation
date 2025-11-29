@@ -29,42 +29,42 @@ press = table2array(data2(:,"PresskPa"));
 [PNET, mdotin, mdotout, nTH, Tturb, Teng, SFC, HR, hMain] = phase2_calcs(nT1, nT2, 65, 14585, Vdot1b, 9784, 1, 0);
 
 %% varying inlet temps phase 1
-T = [35 65 85 105];
+T_1 = [35 65 85 105];
 mdotf = [15981 14585 13518 12410];
 RPM = [9752 9784 9881 9974];
 
-PNET1 = zeros(1,4); 
-mdotin1 = zeros(1,4);
-mdotout1 = zeros(1,4);
-nTH1 = zeros(1,4);
-T41 = zeros(1,4);
-T61 = zeros(1,4);
-SFC1 = zeros(1,4);
-HR1 = zeros(1,4);
+PNET_1 = zeros(1,4); 
+mdotin_1 = zeros(1,4);
+mdotout_1 = zeros(1,4);
+nTH_1 = zeros(1,4);
+T4_1 = zeros(1,4);
+T6_1 = zeros(1,4);
+SFC_1 = zeros(1,4);
+HR_1 = zeros(1,4);
 
 for i = 1:4
-    [PNET1(i), mdotin1(i), mdotout1(i), nTH1(i), T41(i), T61(i), SFC1(i), HR1(i)] = phase1_calcs(nT1, nT2,T(i), mdotf(i), Vdot1b, RPM(i),0);
+    [PNET_1(i), mdotin_1(i), mdotout_1(i), nTH_1(i), T4_1(i), T6_1(i), SFC_1(i), HR_1(i)] = phase1_calcs(nT1, nT2, T_1(i), mdotf(i), Vdot1b, RPM(i),0);
 end
 
 %% varying inlet temps phase 2
-T = [35 65 85 105];
+T_2 = [35 65 85 105];
 mdotf = [15981 14585 13518 12410];
 RPM = [9752 9784 9881 9974];
 
-PNET2 = zeros(1,4); 
-mdotin2 = zeros(1,4);
-mdotout2 = zeros(1,4);
-nTH2 = zeros(1,4);
+PNET_2 = zeros(1,4); 
+mdotin_2 = zeros(1,4);
+mdotout_2 = zeros(1,4);
+nTH_2 = zeros(1,4);
 T25_2 = zeros(1,4);
 T3_2 = zeros(1,4);
 T4_2 = zeros(1,4);
 T48_2 = zeros(1,4);
 T6_2 = zeros(1,4);
-SFC2 = zeros(1,4);
-HR2 = zeros(1,4);
+SFC_2 = zeros(1,4);
+HR_2 = zeros(1,4);
 
 for i = 1:4
-    [PNET2(i), mdotin2(i), mdotout2(i), nTH2(i), T25_2(i), T3_2(i), T4_2(i), T48_2(i), T6_2(i), SFC2(i), HR2(i)] = phase2_calcs(nT1, nT2, T(i), mdotf(i), Vdot1b, RPM(i), 0, 0);
+    [PNET_2(i), mdotin_2(i), mdotout_2(i), nTH_2(i), T25_2(i), T3_2(i), T4_2(i), T48_2(i), T6_2(i), SFC_2(i), HR_2(i)] = phase2_calcs(nT1, nT2, T_2(i), mdotf(i), Vdot1b, RPM(i), 0, 0);
 end
 
 %% varying % mass flow rate
@@ -74,38 +74,73 @@ percent = [.2 .4 .6 .8 1];
 mdotf = 14585 * percent;
 RPM = 9784;
 
-PNET2m = zeros(1,5); 
-mdotin2m = zeros(1,5);
-mdotout2m = zeros(1,5);
-nTH2m = zeros(1,5);
+PNET_m = zeros(1,5); 
+mdotin_m = zeros(1,5);
+mdotout_m = zeros(1,5);
+nTH_m = zeros(1,5);
 T25_m = zeros(1,4);
 T3_m = zeros(1,4);
 T4_m = zeros(1,4);
 T48_m = zeros(1,4);
 T6_m = zeros(1,4);
-SFC2m = zeros(1,5);
-HR2m = zeros(1,5);
+SFC_m = zeros(1,5);
+HR_m = zeros(1,5);
 
 for i = 1:5
-    [PNET2m(i), mdotin2m(i), mdotout2m(i), nTH2m(i), T25_m(i), T3_m(i), T4_m(i), T48_m(i), T6_m(i), SFC2m(i), HR2m(i)] = phase2_calcs(nT1, nT2, T, mdotf(i), Vdot1b, RPM, 0, 0);
+    [PNET_m(i), mdotin_m(i), mdotout_m(i), nTH_m(i), T25_m(i), T3_m(i), T4_m(i), T48_m(i), T6_m(i), SFC_m(i), HR_m(i)] = phase2_calcs(nT1, nT2, T, mdotf(i), Vdot1b, RPM, 0, 0);
 end
 
 %% plots
 
 % Plot vs To - Generator output Wdotgen for 1 and 2 along with measured values (MW)
-
+figure
+plot(T_1, PNET_1, '.-', MarkerSize = 20)
+hold on
+plot(T_2, PNET_2, '.-', MarkerSize = 20)
+xlabel('Temperature [^{\circ}F]')
+ylabel('Generator Output [MW]')
+ylim([0 40])
+legend('Phase 1','Phase 2','Measured Values')
+title('Generator Output Comparison')
 
 % Plot vs To - Inlet mass flow rate and fuel mass flow rate for 1 and 2, two y axis (lbm/h) 
 
 
-% Plot vs To - T4 for 1 and 2, phase 2 equiv ratio
+%% Plot vs To - T4 for 1 and 2, phase 2 equiv ratio
+figure
+plot(T_1, T4_1, '.-', MarkerSize = 20)
+hold on
+plot(T_2, T4_2, '.-', MarkerSize = 20)
+xlabel('Temperature [^{\circ}F]')
+ylabel('T4 [^{\circ}F]')
+ylim([0 2500])
+legend('Phase 1','Phase 2','Phase 2 Equivalence Ratio')
+title('Temperature at Stage 4 and Equivalence Ratio')
 
+%% Plot vs To - T25,3,4,48,6 for phase 2 and T3,48,6 from data
+figure
+plot(T_2, T25_2, '.-', MarkerSize = 20)
+hold on
+plot(T_2, T3_2, '.-', MarkerSize = 20)
+plot(T_2, T4_2, '.-', MarkerSize = 20)
+plot(T_2, T48_2, '.-', MarkerSize = 20)
+plot(T_2, T6_2, '.-', MarkerSize = 20)
+xlabel('Temperature [^{\circ}F]')
+ylabel('Temperature [^{\circ}F]')
+ylim([0 2500])
+legend('Phase 2 T25','Phase 2 T3','Phase 2 T4','Phase 2 T48','Phase 2 T6')
+title('Stage Temperature Comparison')
 
-% Plot vs To - T25,3,4,48,6 for phase 2 and T3,48,6 from data
-
-
-% Plot vs To - Thermal efficiencies nTH for 1 and 2
-
+%% Plot vs To - Thermal efficiencies nTH for 1 and 2
+figure
+plot(T_1, nTH_1, '.-', MarkerSize = 20)
+hold on
+plot(T_2, nTH_2, '.-', MarkerSize = 20)
+xlabel('Temperature [^{\circ}F]')
+ylabel('nTH')
+% ylim([0 2500])
+legend('Phase 1','Phase 2')
+title('Thermal Efficiency Comparison')
 
 % Plot vs To - SFC (lbm/kWh) and HR (BTU/kWh), two y axis
 
