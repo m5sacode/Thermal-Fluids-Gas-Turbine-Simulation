@@ -15,7 +15,10 @@ function [PNET, mdotin, mdotout, nTH, Tturb, Teng, SFC, HR, hMain] = phase2_calc
     % general constants
     Rbar = 8.314; % kJ/kmol*K
     Mair = 28.02*yN2 + 31.999*yO2; % kg/kmol
-    Mh2o = 18.01;
+    MH2O = 18.01;
+    MCO2 = 44.01;
+    MO2 = 32;
+    MN2 = 28.01;
     
 
     % conversion values
@@ -92,16 +95,14 @@ function [PNET, mdotin, mdotout, nTH, Tturb, Teng, SFC, HR, hMain] = phase2_calc
     
     T1 = T0;
     
-    sb1 = sbarcalc(T1);
-    
     %% state 1 -> 2: evaporative cooler
     p2 = p1;
     
     RH2 = 1;
     
     % enthalpies at state 1
-    ha1 = hcalc(T1,yO2,yN2,0,0,Mair);
-    hv1 = hcalc(T1,0,0,1,0,Mh2o);
+    ha1 = hcalc(T1,yO2,yN2,0,0,Mair)/Mair;
+    hv1 = hcalc(T1,0,0,1,0,MH2O)/MH2O;
     
     w1 = wcalc(RH1,p1,T1);
     
@@ -114,8 +115,8 @@ function [PNET, mdotin, mdotout, nTH, Tturb, Teng, SFC, HR, hMain] = phase2_calc
     
     while err > 1e-3
         T2 = (Tmin+Tmax)/2;
-        ha2 = hcalc(T2,yO2,yN2,0,0,Mair);
-        hv2 = hcalc(T2,0,0,1,0,Mh2o);
+        ha2 = hcalc(T2,yO2,yN2,0,0,Mair)/Mair;
+        hv2 = hcalc(T2,0,0,1,0,MH2O)/MH2O;
         w2 = wcalc(RH2,p2,T2);
         h2 = ha2 + w2*hv2;
         err = abs(h1-h2);
@@ -129,36 +130,42 @@ function [PNET, mdotin, mdotout, nTH, Tturb, Teng, SFC, HR, hMain] = phase2_calc
     % mass and molar flow rates
     Vdot2 = Vdot0;
     ndot2 = (p2*Vdot2)/(Rbar*T2);
-    ndota = ndot2/(1+w2*(Mair/Mh2o));
+    ndota = ndot2/(1+w2*(Mair/MH2O));
     ndotv2 = ndot2-ndota;
-    mdotv2 = ndotv2*Mh2o;
+    mdotv2 = ndotv2*MH2O;
     mdota = ndota*Mair;
     mdotv1 = w1*mdota;
     mdotliq = mdotv2-mdotv1;
 
+    y2O2 = yO2*ndota/ndot2;
+    y2N2 = yN2*ndota/ndot2;
+    y2H2O = ndotv2/ndot2;
+
+    M2 = y2H2O*MH2O+y2N2*MN2+y2O2*MO2;
+
     %% state 2 -> 25: LP compressor
     p25 = p2 * rLPC;
-    sb2 = sbarcalc(T2);
+    sb2 = scalc(T2, y2O2, y2N2, y2H2O, 0, M2);
     sb25s = sb2 + Rbar*log(p25/p2);
-    T25s = TcalcS(sb25s);
-    hb25s = hbarcalc(T25s);
-    h25s = hb25s / Mair;
+    T25s = TcalcS2(sb25s, y2O2, y2N2, y2H2O, 0, M2);
+    hb25s = hcalc(T25s,y2O2,y2N2,y2H2O,0,M2);
+    h25s = hb25s / M2;
     h25 = h2 - (h2 - h25s)/nLPC;
-    hb25 = h25 * Mair;
-    T25 = TcalcH(hb25);
+    hb25 = h25 * M2;
+    T25 = TcalcH2(hb25, y2O2, y2N2, y2H2O, 0, M2);
     WdotC1 = mdot0*(h25-h2);
     
     %% state 25 -> 3: HP compressor
     p3 = p25 * rHPC;
-    sb25 = sbarcalc(T25);
+    sb25 = scalc(T25, y2O2, y2N2, y2H2O, 0, M2);
     sb3s = sb25 + Rbar*log(p3/p25);
-    T3s = TcalcS(sb3s);
-    hb3s = hbarcalc(T3s);
-    h3s = hb3s / Mair;
+    T3s = TcalcS2(sb3s, y2O2, y2N2, y2H2O, 0, M2);
+    hb3s = hcalc(T3s,y2O2,y2N2,y2H2O,0,M2);
+    h3s = hb3s / M2;
     h3 = h25 - (h25 - h3s)/nHPC;
-    hb3 = h3 * Mair;
-    T3 = TcalcH(hb3);
-    sb3 = sbarcalc(T3);
+    hb3 = h3 * M2;
+    T3 = TcalcH2(hb3, y2O2, y2N2, y2H2O, 0, M2);
+    sb3 = scalc(T3, y2O2, y2N2, y2H2O, 0, M2);
     WdotC2 = mdot0*(h3-h25);
     
     %% state 3 -> 4: combustor
@@ -175,9 +182,9 @@ function [PNET, mdotin, mdotout, nTH, Tturb, Teng, SFC, HR, hMain] = phase2_calc
     hfCO2 = -393520;
     
     % inlet molar sensible enthalpies (assuming fuel enters at 298K)
-    hsO2i = hcalc(T3, 1, 0, 0, 0, 32);
-    hsN2i = hcalc(T3, 0, 1, 0, 0, 28.01);
-    hsH2Oi = hcalc(T3, 0, 0, 1, 0, 18.02);
+    hsO2i = hcalc(T3, 1, 0, 0, 0, MO2);
+    hsN2i = hcalc(T3, 0, 1, 0, 0, MN2);
+    hsH2Oi = hcalc(T3, 0, 0, 1, 0, MH2O);
 
     Hdot3 = ndotf*CH4*hfCH4 + ndotf*C2H6*hfC2H6 + Aodot*hsO2i + 3.76*Aodot*hsN2i + A1dot*(hfH2O+hsH2Oi);
 
@@ -190,10 +197,10 @@ function [PNET, mdotin, mdotout, nTH, Tturb, Teng, SFC, HR, hMain] = phase2_calc
         T4 = (Tmin+Tmax)/2;
 
         % outlet molar sensible enthalpies
-        hsO2o = hcalc(T4, 1, 0, 0, 0, 32);
-        hsN2o = hcalc(T4, 0, 1, 0, 0, 28.01);
-        hsH2Oo = hcalc(T4, 0, 0, 1, 0, 18.02);
-        hsCO2o = hcalc(T4, 0, 0, 0, 1, 44.01);
+        hsO2o = hcalc(T4, 1, 0, 0, 0, MO2);
+        hsN2o = hcalc(T4, 0, 1, 0, 0, MN2);
+        hsH2Oo = hcalc(T4, 0, 0, 1, 0, MH2O);
+        hsCO2o = hcalc(T4, 0, 0, 0, 1, MCO2);
 
         Hdot4 = 1.04*ndotf*(hfCO2+hsCO2o) + ((4.08/2)*ndotf+A1dot)*(hfH2O+hsH2Oo) + (Aodot-1.04*ndotf)*(hsO2o) + 3.76*Aodot*hsN2o;
         
@@ -210,50 +217,61 @@ function [PNET, mdotin, mdotout, nTH, Tturb, Teng, SFC, HR, hMain] = phase2_calc
     Qdot = mdotf * LHV;
 
     % properties downstream of combustor
-    sb4 = sbarcalc(T4);
+    ndotp = 1.04*ndotf+(4.08/2)*ndotf+A1dot+Aodot-1.04*ndotf+Aodot*3.76;
+    yCO2p = (1.04*ndotf)/ndotp;
+    yH2Op = ((4.08/2)*ndotf+A1dot)/ndotp;
+    yO2p = (Aodot-1.04*ndotf)/ndotp;
+    yN2p = (Aodot*3.76)/ndotp;
+
+    Mp = yCO2p*MCO2+yH2Op*MH2O+yO2p*MO2+yN2p*MN2;
+
+    h4 = hcalc(T4,yO2p,yN2p,yH2Op,yCO2p,Mp)/Mp;
+
+    sb4 = scalc(T4,yO2p,yN2p,yH2Op,yCO2p,Mp);
+    
     p4 = p3;
 
-    
-    
+    mdotp = ndotp*Mp;
+
 
     %% state 4 -> 48: HP turbine
     WdotT1 = WdotC1 + WdotC2;
-    h48 = h4 - (WdotT1/mdot4);
-    hb48 = h48 * M;
-    T48 = TcalcH(hb48);
-    sb48 = sbarcalc(T48);
-    wT1 = WdotT1/mdot4;
+    h48 = h4 - (WdotT1/mdotp);
+    hb48 = h48 * Mp;
+    T48 = TcalcH2(hb48,yO2p,yN2p,yH2Op,yCO2p,Mp);
+    sb48 = scalc(T48,yO2p,yN2p,yH2Op,yCO2p,Mp);
+    wT1 = WdotT1/mdotp;
     h48s = h4 - wT1/nHPT;
-    hb48s = h48s * M;
-    T48s = TcalcH(hb48s);
-    sb48s = sbarcalc(T48s);
+    hb48s = h48s * Mp;
+    T48s = TcalcH2(hb48s,yO2p,yN2p,yH2Op,yCO2p,Mp);
+    sb48s = scalc(T48s,yO2p,yN2p,yH2Op,yCO2p,Mp);
     p48 = p4*exp((sb48s-sb4)/Rbar);
 
     %% state 48 -> 5: LP turbine
     p5 = p0 + delPex;
     sb5s = sb48 + Rbar*log(p5/p48); 
-    T5s = TcalcS(sb5s);
-    hb5s = hbarcalc(T5s);
+    T5s = TcalcS2(sb5s,yO2p,yN2p,yH2Op,yCO2p,Mp);
+    hb5s = hcalc(T5s,yO2p,yN2p,yH2Op,yCO2p,Mp);
     h5s = hb5s / Mair;
     h5 = h48 - nLPT*(h48-h5s);
     hb5 = h5 * Mair;
-    T5 = TcalcH(hb5);
-    sb5 = sbarcalc(T5);
-    WdotT2 = mdot4*(h48 - h5);
+    T5 = TcalcH2(hb5,yO2p,yN2p,yH2Op,yCO2p,Mp);
+    sb5 = scalc(T5,yO2p,yN2p,yH2Op,yCO2p,Mp);
+    WdotT2 = mdotp*(h48 - h5);
     WdotELEC = WdotT2*nGEN;
 
     %% state 6: after nozzle
     p6 = p0;
     
     T6 = T5;
-    sb6 = sbarcalc(T6);
+    sb6 = scalc(T6,yO2p,yN2p,yH2Op,yCO2p,Mp);
     
     %% Output Performance Parameters
     
     if table == 1
-        states = [1 2 25 3 4 48 5 6]';
-        allT = 1/R2K*[T1 T2 T25 T3 T4 T48 T5 T6]'- 459.67;
-        allp = 1/psi2kPa*[p1 p2 p25 p3 p4 p48 p5 p6]';
+        states = [0 1 2 25 3 4 48 5 6]';
+        allT = 1/R2K*[T0 T1 T2 T25 T3 T4 T48 T5 T6]'- 459.67;
+        allp = 1/psi2kPa*[p0 p1 p2 p25 p3 p4 p48 p5 p6]';
         
         data = [states allT, allp];
         
@@ -264,7 +282,7 @@ function [PNET, mdotin, mdotout, nTH, Tturb, Teng, SFC, HR, hMain] = phase2_calc
     Teng = T6 * 1/R2K - 459.67;
     PNET = WdotELEC / 1000;
     mdotin = mdot0 * 1/lb2kg * hr2s; 
-    mdotout = mdot4 * 1/lb2kg * hr2s; 
+    mdotout = mdotp * 1/lb2kg * hr2s; 
     nTH = WdotELEC/Qdot;
     SFC = mdotf/WdotELEC * 1/lb2kg * hr2s; 
     HR = SFC*LHV * 1/BTUlb2kJkg;

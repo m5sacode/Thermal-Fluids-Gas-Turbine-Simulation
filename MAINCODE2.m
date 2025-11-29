@@ -26,7 +26,7 @@ press = table2array(data2(:,"PresskPa"));
 [nT1, nT2, Vdot1b] = phase1_basecase(0);
 
 %% base case phase 2
-[PNET, mdotin, mdotout, nTH, Tturb, Teng, SFC, HR, hMain] = phase2_calcs(nT1, nT2, 65, 14585, Vdot1b, 9784, 1, 0)
+[PNET, mdotin, mdotout, nTH, Tturb, Teng, SFC, HR, hMain] = phase2_calcs(nT1, nT2, 65, 14585, Vdot1b, 9784, 1, 0);
 
 %% varying inlet temps phase 1
 T = [35 65 85 105];
