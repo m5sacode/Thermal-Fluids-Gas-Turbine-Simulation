@@ -7,7 +7,7 @@
 %
 % 
 
-function [PNET, mdotin, mdotout, nTH, Tturb, Teng, SFC, HR, hMain] = phase2_calcs(nT1, nT2, Tin, mdotf, Vdot1b, RPM, table, TSplot)
+function [PNET, mdotin, mdotout, nTH, T4out, T6out, SFC, HR, hMain] = phase2_calcs(nT1, nT2, Tin, mdotf, Vdot1b, RPM, table, TSplot)
     %% Set Up
 
     global yN2 yO2
@@ -95,29 +95,14 @@ function [PNET, mdotin, mdotout, nTH, Tturb, Teng, SFC, HR, hMain] = phase2_calc
     
     T1 = T0;
     
-    % ndot1 = (p1*Vdot0)/(Rbar*T1);
-    % w1 = wcalc(RH1,p1,T1);
-    % 
-    % ndota = ndot1/(1+w1*(Mair/MH2O));
-    % ndotv1 = ndot1-ndota;
-    % mdotv1 = ndotv1*MH2O;
-    % mdota = ndota*Mair;
-    % 
-    % y1O2 = yO2*ndota/ndot1;
-    % y1N2 = yN2*ndota/ndot1;
-    % y1H2O = ndotv1/ndot1;
-    % 
-    % 
-    % sb1 = scalc(T1, y1O2, y1N2, y1H2O, 0, Mair);
-    
     %% state 1 -> 2: evaporative cooler
     p2 = p1;
     
     RH2 = 1;
     
     % enthalpies at state 1
-    ha1 = hcalc(T1,yO2,yN2,0,0,Mair);
-    hv1 = hcalc(T1,0,0,1,0,MH2O);
+    ha1 = hcalc(T1,yO2,yN2,0,0,Mair)/Mair;
+    hv1 = hcalc(T1,0,0,1,0,MH2O)/MH2O;
     
     w1 = wcalc(RH1,p1,T1);
     
@@ -130,14 +115,14 @@ function [PNET, mdotin, mdotout, nTH, Tturb, Teng, SFC, HR, hMain] = phase2_calc
     
     while err > 1e-3
         T2 = (Tmin+Tmax)/2;
-        ha2 = hcalc(T2,yO2,yN2,0,0,Mair);
-        hv2 = hcalc(T2,0,0,1,0,MH2O);
+        ha2 = hcalc(T2,yO2,yN2,0,0,Mair)/Mair;
+        hv2 = hcalc(T2,0,0,1,0,MH2O)/MH2O;
         w2 = wcalc(RH2,p2,T2);
-        h2 = ha2 + w2*hv2;
-        err = abs(h1-h2);
-        if h1 > h2
+        h2_da = ha2 + w2*hv2;
+        err = abs(h1-h2_da);
+        if h1 > h2_da
             Tmin = T2;
-        elseif h1 < h2
+        elseif h1 < h2_da
             Tmax = T2;
         end    
     end
@@ -145,40 +130,45 @@ function [PNET, mdotin, mdotout, nTH, Tturb, Teng, SFC, HR, hMain] = phase2_calc
     % mass and molar flow rates
     Vdot2 = Vdot0;
     ndot2 = (p2*Vdot2)/(Rbar*T2);
-    ndota1 = ndot2/(1+w2*(Mair/MH2O));
+    ndota = ndot2/(1+w2*(Mair/MH2O));
     ndotv2 = ndot2-ndota;
     mdotv2 = ndotv2*MH2O;
     mdota = ndota*Mair;
     mdotv1 = w1*mdota;
     mdotliq = mdotv2-mdotv1;
 
-    y2O2 = y1O2*ndota/ndot2;
-    y2N2 = y1N2*ndota/ndot2;
+    y2O2 = yO2*ndota/ndot2;
+    y2N2 = yN2*ndota/ndot2;
     y2H2O = ndotv2/ndot2;
+
+    M2 = y2H2O*MH2O+y2N2*MN2+y2O2*MO2;
+
+    hb2 = hcalc(T2, y2O2, y2N2, y2H2O, 0, M2);
+    h2 = hb2 / M2;
 
     %% state 2 -> 25: LP compressor
     p25 = p2 * rLPC;
-    sb2 = scalc(T2, y2O2, y2N2, y2H2O, 0, Mair);
+    sb2 = scalc(T2, y2O2, y2N2, y2H2O, 0, M2);
     sb25s = sb2 + Rbar*log(p25/p2);
-    T25s = TcalcS2(sb25s, y2O2, y2N2, y2H2O, 0, Mair);
-    hb25s = hcalc(T25s,y2O2,y2N2,y2H2O,0,Mair);
-    h25s = hb25s / Mair;
+    T25s = TcalcS2(sb25s, y2O2, y2N2, y2H2O, 0, M2);
+    hb25s = hcalc(T25s,y2O2,y2N2,y2H2O,0,M2);
+    h25s = hb25s / M2;
     h25 = h2 - (h2 - h25s)/nLPC;
-    hb25 = h25 * Mair;
-    T25 = TcalcH2(hb25, y2O2, y2N2, y2H2O, 0, Mair);
+    hb25 = h25 * M2;
+    T25 = TcalcH2(hb25, y2O2, y2N2, y2H2O, 0, M2);
     WdotC1 = mdot0*(h25-h2);
     
     %% state 25 -> 3: HP compressor
     p3 = p25 * rHPC;
-    sb25 = scalc(T25, y2O2, y2N2, y2H2O, 0, Mair);
+    sb25 = scalc(T25, y2O2, y2N2, y2H2O, 0, M2);
     sb3s = sb25 + Rbar*log(p3/p25);
-    T3s = TcalcS2(sb3s, y2O2, y2N2, y2H2O, 0, Mair);
-    hb3s = hcalc(T3s,y2O2,y2N2,y2H2O,0,Mair);
-    h3s = hb3s / Mair;
+    T3s = TcalcS2(sb3s, y2O2, y2N2, y2H2O, 0, M2);
+    hb3s = hcalc(T3s,y2O2,y2N2,y2H2O,0,M2);
+    h3s = hb3s / M2;
     h3 = h25 - (h25 - h3s)/nHPC;
-    hb3 = h3 * Mair;
-    T3 = TcalcH2(hb3, y2O2, y2N2, y2H2O, 0, Mair);
-    sb3 = scalc(T3, y2O2, y2N2, y2H2O, 0, Mair);
+    hb3 = h3 * M2;
+    T3 = TcalcH2(hb3, y2O2, y2N2, y2H2O, 0, M2);
+    sb3 = scalc(T3, y2O2, y2N2, y2H2O, 0, M2);
     WdotC2 = mdot0*(h3-h25);
     
     %% state 3 -> 4: combustor
@@ -237,71 +227,65 @@ function [PNET, mdotin, mdotout, nTH, Tturb, Teng, SFC, HR, hMain] = phase2_calc
     yN2p = (Aodot*3.76)/ndotp;
 
     Mp = yCO2p*MCO2+yH2Op*MH2O+yO2p*MO2+yN2p*MN2;
-    xCO2p = yCO2p*MCO2/Mp;
-    xH2Op = yH2Op*MH2O/Mp;
-    xO2p = yO2p*MO2/Mp;
-    xN2p = yN2p*MN2/Mp;
 
-    h4CO2 = (hfCO2 + hsCO2o)/MCO2;
-    h4H2O = (hfH2O + hsH2Oo)/MH2O;
-    h4O2 = hsO2o/MO2;
-    h4N2 = hsN2o/MN2;
+    h4 = hcalc(T4,yO2p,yN2p,yH2Op,yCO2p,Mp)/Mp;
 
-    h4 = xCO2p*h4CO2+xH2Op*h4H2O+xO2p*h4O2+xN2p*h4N2;
-
-    sb4 = sclc(T4);
+    sb4 = scalc(T4,yO2p,yN2p,yH2Op,yCO2p,Mp);
+    
     p4 = p3;
+
+    mdotp = ndotp*Mp;
 
 
     %% state 4 -> 48: HP turbine
     WdotT1 = WdotC1 + WdotC2;
-    h48 = h4 - (WdotT1/mdot4);
-    hb48 = h48 * M;
-    T48 = TcalcH(hb48);
-    sb48 = sbarcalc(T48);
-    wT1 = WdotT1/mdot4;
+    h48 = h4 - (WdotT1/mdotp);
+    hb48 = h48 * Mp;
+    T48 = TcalcH2(hb48,yO2p,yN2p,yH2Op,yCO2p,Mp);
+    sb48 = scalc(T48,yO2p,yN2p,yH2Op,yCO2p,Mp);
+    wT1 = WdotT1/mdotp;
     h48s = h4 - wT1/nHPT;
-    hb48s = h48s * M;
-    T48s = TcalcH(hb48s);
-    sb48s = sbarcalc(T48s);
+    hb48s = h48s * Mp;
+    T48s = TcalcH2(hb48s,yO2p,yN2p,yH2Op,yCO2p,Mp);
+    sb48s = scalc(T48s,yO2p,yN2p,yH2Op,yCO2p,Mp);
     p48 = p4*exp((sb48s-sb4)/Rbar);
 
     %% state 48 -> 5: LP turbine
     p5 = p0 + delPex;
     sb5s = sb48 + Rbar*log(p5/p48); 
-    T5s = TcalcS(sb5s);
-    hb5s = hbarcalc(T5s);
+    T5s = TcalcS2(sb5s,yO2p,yN2p,yH2Op,yCO2p,Mp);
+    hb5s = hcalc(T5s,yO2p,yN2p,yH2Op,yCO2p,Mp);
     h5s = hb5s / Mair;
     h5 = h48 - nLPT*(h48-h5s);
     hb5 = h5 * Mair;
-    T5 = TcalcH(hb5);
-    sb5 = sbarcalc(T5);
-    WdotT2 = mdot4*(h48 - h5);
+    T5 = TcalcH2(hb5,yO2p,yN2p,yH2Op,yCO2p,Mp);
+    sb5 = scalc(T5,yO2p,yN2p,yH2Op,yCO2p,Mp);
+    WdotT2 = mdotp*(h48 - h5);
     WdotELEC = WdotT2*nGEN;
 
     %% state 6: after nozzle
     p6 = p0;
     
     T6 = T5;
-    sb6 = sbarcalc(T6);
+    sb6 = scalc(T6,yO2p,yN2p,yH2Op,yCO2p,Mp);
     
     %% Output Performance Parameters
     
     if table == 1
-        states = [1 2 25 3 4 48 5 6]';
-        allT = 1/R2K*[T1 T2 T25 T3 T4 T48 T5 T6]'- 459.67;
-        allp = 1/psi2kPa*[p1 p2 p25 p3 p4 p48 p5 p6]';
+        states = [0 1 2 25 3 4 48 5 6]';
+        allT = 1/R2K*[T0 T1 T2 T25 T3 T4 T48 T5 T6]'- 459.67;
+        allp = 1/psi2kPa*[p0 p1 p2 p25 p3 p4 p48 p5 p6]';
         
         data = [states allT, allp];
         
         BaseCaseStates = array2table(data, "VariableNames", ["state", "temp (F)", "pressure (psi)"])
     end
 
-    Tturb = T4 * 1/R2K - 459.67;
-    Teng = T6 * 1/R2K - 459.67;
+    T4out = T4 * 1/R2K - 459.67;
+    T6out = T6 * 1/R2K - 459.67;
     PNET = WdotELEC / 1000;
     mdotin = mdot0 * 1/lb2kg * hr2s; 
-    mdotout = mdot4 * 1/lb2kg * hr2s; 
+    mdotout = mdotp * 1/lb2kg * hr2s; 
     nTH = WdotELEC/Qdot;
     SFC = mdotf/WdotELEC * 1/lb2kg * hr2s; 
     HR = SFC*LHV * 1/BTUlb2kJkg;

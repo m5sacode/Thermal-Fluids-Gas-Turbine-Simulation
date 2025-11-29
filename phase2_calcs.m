@@ -7,7 +7,7 @@
 %
 % 
 
-function [PNET, mdotin, mdotout, nTH, Tturb, Teng, SFC, HR, hMain] = phase2_calcs(nT1, nT2, Tin, mdotf, Vdot1b, RPM, table, TSplot)
+function [PNET, mdotin, mdotout, nTH, T25out, T3out, T4out, T48out, T6out, SFC, HR, hMain] = phase2_calcs(nT1, nT2, Tin, mdotf, Vdot1b, RPM, table, TSplot)
     %% Set Up
 
     global yN2 yO2
@@ -118,11 +118,11 @@ function [PNET, mdotin, mdotout, nTH, Tturb, Teng, SFC, HR, hMain] = phase2_calc
         ha2 = hcalc(T2,yO2,yN2,0,0,Mair)/Mair;
         hv2 = hcalc(T2,0,0,1,0,MH2O)/MH2O;
         w2 = wcalc(RH2,p2,T2);
-        h2 = ha2 + w2*hv2;
-        err = abs(h1-h2);
-        if h1 > h2
+        h2_da = ha2 + w2*hv2;
+        err = abs(h1-h2_da);
+        if h1 > h2_da
             Tmin = T2;
-        elseif h1 < h2
+        elseif h1 < h2_da
             Tmax = T2;
         end    
     end
@@ -142,6 +142,9 @@ function [PNET, mdotin, mdotout, nTH, Tturb, Teng, SFC, HR, hMain] = phase2_calc
     y2H2O = ndotv2/ndot2;
 
     M2 = y2H2O*MH2O+y2N2*MN2+y2O2*MO2;
+
+    hb2 = hcalc(T2, y2O2, y2N2, y2H2O, 0, M2);
+    h2 = hb2 / M2;
 
     %% state 2 -> 25: LP compressor
     p25 = p2 * rLPC;
@@ -278,8 +281,11 @@ function [PNET, mdotin, mdotout, nTH, Tturb, Teng, SFC, HR, hMain] = phase2_calc
         BaseCaseStates = array2table(data, "VariableNames", ["state", "temp (F)", "pressure (psi)"])
     end
 
-    Tturb = T4 * 1/R2K - 459.67;
-    Teng = T6 * 1/R2K - 459.67;
+    T25out = T25 * 1/R2K - 459.67;
+    T3out = T3 * 1/R2K - 459.67;
+    T4out = T4 * 1/R2K - 459.67;
+    T48out = T48 * 1/R2K - 459.67;
+    T6out = T6 * 1/R2K - 459.67;
     PNET = WdotELEC / 1000;
     mdotin = mdot0 * 1/lb2kg * hr2s; 
     mdotout = mdotp * 1/lb2kg * hr2s; 
