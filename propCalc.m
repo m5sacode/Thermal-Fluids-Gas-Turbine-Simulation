@@ -1,5 +1,5 @@
 % computes u, h, so, s
-% assumes T input is in C
+% assumes T input is in K
 
 function [ui, hi, soi, si] = propCalc(T, p, Mi, Avec)
     
@@ -11,7 +11,7 @@ function [ui, hi, soi, si] = propCalc(T, p, Mi, Avec)
     pref = 101; % [kPa]
     R = 8.314/Mi;
 
-    TK = T + 273;
+    TK = T;
 
     % create functions
     cpFun = @(T) Avec(1) + Avec(2)*(T/1000) + Avec(3)*(T/1000).^2 + Avec(4)*(T/1000).^3 + Avec(5)*(T/1000).^4 + Avec(6)*(T/1000).^5 + Avec(7)*(T/1000).^6 + Avec(8)*(T/1000).^7 + Avec(9)*(T/1000).^8;

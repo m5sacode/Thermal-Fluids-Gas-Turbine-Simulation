@@ -20,10 +20,10 @@ O2so = table2array(data(:,"O2so"));
 
 data2 = readtable('pressuretemps.xlsx');
 Temp2 = table2array(data2(:,"TempK"));
-press = table2array(data2(:,"PressBar"));
+press = table2array(data2(:,"PresskPa"));
 
 %% gather base case phase 1 info
-[nT1, nT2, Vdot1b] = phase1_basecase(1);
+[nT1, nT2, Vdot1b] = phase1_basecase(0);
 
 %% base case phase 2
 [PNET, mdotin, mdotout, nTH, Tturb, Teng, SFC, HR, hMain] = phase2_calcs(nT1, nT2, 65, 14585, Vdot1b, 9784, 1, 0)
