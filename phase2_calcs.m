@@ -7,7 +7,7 @@
 %
 % 
 
-function [PNET, mdotin, mdotout, nTH, T25out, T3out, T4out, T48out, T6out, SFC, HR, hMain] = phase2_calcs(nT1, nT2, Tin, mdotf, Vdot1b, RPM, table, TSplot)
+function [PNET, mdotin, mdotout, nTH, T25out, T3out, T4out, T48out, T6out, SFC, HR, ER, TWR, hMain] = phase2_calcs(nT1, nT2, Tin, mdotf, Vdot1b, RPM, table, TSplot, Evap)
     %% Set Up
 
     global yN2 yO2
@@ -97,35 +97,40 @@ function [PNET, mdotin, mdotout, nTH, T25out, T3out, T4out, T48out, T6out, SFC, 
     
     %% state 1 -> 2: evaporative cooler
     p2 = p1;
-    
-    RH2 = 1;
-    
-    % enthalpies at state 1
-    ha1 = hcalc(T1,yO2,yN2,0,0,Mair)/Mair;
-    hv1 = hcalc(T1,0,0,1,0,MH2O)/MH2O;
-    
     w1 = wcalc(RH1,p1,T1);
+
+    if Evap == 1
+        RH2 = 1;
     
-    h1 = ha1 + w1*hv1;
-    
-    % iterate to find T2
-    err = 1;
-    Tmin = 271.01;
-    Tmax = 633;
-    
-    while err > 1e-3
-        T2 = (Tmin+Tmax)/2;
-        ha2 = hcalc(T2,yO2,yN2,0,0,Mair)/Mair;
-        hv2 = hcalc(T2,0,0,1,0,MH2O)/MH2O;
-        w2 = wcalc(RH2,p2,T2);
-        h2_da = ha2 + w2*hv2;
-        err = abs(h1-h2_da);
-        if h1 > h2_da
-            Tmin = T2;
-        elseif h1 < h2_da
-            Tmax = T2;
-        end    
+        % enthalpies at state 1
+        ha1 = hcalc(T1,yO2,yN2,0,0,Mair)/Mair;
+        hv1 = hcalc(T1,0,0,1,0,MH2O)/MH2O;
+                
+        h1_da = ha1 + w1*hv1;
+        
+        % iterate to find T2
+        err = 1;
+        Tmin = 271.01;
+        Tmax = 633;
+        
+        while err > 1e-3
+            T2 = (Tmin+Tmax)/2;
+            ha2 = hcalc(T2,yO2,yN2,0,0,Mair)/Mair;
+            hv2 = hcalc(T2,0,0,1,0,MH2O)/MH2O;
+            w2 = wcalc(RH2,p2,T2);
+            h2_da = ha2 + w2*hv2;
+            err = abs(h1_da-h2_da);
+            if h1_da > h2_da
+                Tmin = T2;
+            elseif h1_da < h2_da
+                Tmax = T2;
+            end    
+        end
+    else
+        T2 = T1;
+        w2 = w1;
     end
+
     
     % mass and molar flow rates
     Vdot2 = Vdot0;
@@ -142,6 +147,7 @@ function [PNET, mdotin, mdotout, nTH, T25out, T3out, T4out, T48out, T6out, SFC, 
     y2H2O = ndotv2/ndot2;
 
     M2 = y2H2O*MH2O+y2N2*MN2+y2O2*MO2;
+    mdot2 = ndot2 * M2;
 
     hb2 = hcalc(T2, y2O2, y2N2, y2H2O, 0, M2);
     h2 = hb2 / M2;
@@ -156,7 +162,7 @@ function [PNET, mdotin, mdotout, nTH, T25out, T3out, T4out, T48out, T6out, SFC, 
     h25 = h2 - (h2 - h25s)/nLPC;
     hb25 = h25 * M2;
     T25 = TcalcH2(hb25, y2O2, y2N2, y2H2O, 0, M2);
-    WdotC1 = mdot0*(h25-h2);
+    WdotC1 = mdot2*(h25-h2);
     
     %% state 25 -> 3: HP compressor
     p3 = p25 * rHPC;
@@ -169,7 +175,7 @@ function [PNET, mdotin, mdotout, nTH, T25out, T3out, T4out, T48out, T6out, SFC, 
     hb3 = h3 * M2;
     T3 = TcalcH2(hb3, y2O2, y2N2, y2H2O, 0, M2);
     sb3 = scalc(T3, y2O2, y2N2, y2H2O, 0, M2);
-    WdotC2 = mdot0*(h3-h25);
+    WdotC2 = mdot2*(h3-h25);
     
     %% state 3 -> 4: combustor
     
@@ -255,9 +261,9 @@ function [PNET, mdotin, mdotout, nTH, T25out, T3out, T4out, T48out, T6out, SFC, 
     sb5s = sb48 + Rbar*log(p5/p48); 
     T5s = TcalcS2(sb5s,yO2p,yN2p,yH2Op,yCO2p,Mp);
     hb5s = hcalc(T5s,yO2p,yN2p,yH2Op,yCO2p,Mp);
-    h5s = hb5s / Mair;
+    h5s = hb5s / Mp;
     h5 = h48 - nLPT*(h48-h5s);
-    hb5 = h5 * Mair;
+    hb5 = h5 * Mp;
     T5 = TcalcH2(hb5,yO2p,yN2p,yH2Op,yCO2p,Mp);
     sb5 = scalc(T5,yO2p,yN2p,yH2Op,yCO2p,Mp);
     WdotT2 = mdotp*(h48 - h5);
@@ -292,6 +298,10 @@ function [PNET, mdotin, mdotout, nTH, T25out, T3out, T4out, T48out, T6out, SFC, 
     nTH = WdotELEC/Qdot;
     SFC = mdotf/WdotELEC * 1/lb2kg * hr2s; 
     HR = SFC*LHV * 1/BTUlb2kJkg;
+    FARa = ndotf / ndota;
+    FARs = 1 / (1.04 * 4.76);
+    ER = FARa / FARs;
+    TWR = (WdotC1 + WdotC2)/(WdotT1 + WdotT2);
     
     %% T–s diagram
     hMain = []; % placeholder in case no plot happens
