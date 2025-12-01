@@ -22,6 +22,14 @@ data2 = readtable('pressuretemps.xlsx');
 Temp2 = table2array(data2(:,"TempK"));
 press = table2array(data2(:,"PresskPa"));
 
+data3 = readtable('measured data.xlsx');
+InTemp = table2array(data2(:,"Inlet_Temperature"));
+POUT = table2array(data2(:,"Power_Output_kW"));
+T3 = table2array(data2(:,"T3"));
+T48 = table2array(data2(:,"T48"));
+T6 = table2array(data2(:,"T6"));
+
+
 %% gather base case phase 1 info
 [nT1, nT2, Vdot1b] = phase1_basecase(0);
 
@@ -236,7 +244,7 @@ figure
 yyaxis left
 a1 = plot(percent*100, PNET_m, '.-', MarkerSize = 20);
 ylabel('Generator Output [MW]')
-%ylim([0 40])
+ylim([-.1 40])
 
 yyaxis right
 a2 = plot(percent*100, TWR_m, '.-', MarkerSize = 20);
@@ -252,18 +260,18 @@ legend([a1 a2],{'Generator Power Output','Turbine Work Ratio'}, Location = 'nort
 figure
 yyaxis left
 a1 = plot(percent*100, nTH_m, '.-', MarkerSize = 20);
-ylabel('Generator Output [MW]')
-% ylim([0 .45])
+ylabel('nTH')
+ylim([-.05 .4])
 
 yyaxis right
 a2 = plot(percent*100, TWR_m, '.-', MarkerSize = 20);
 ylabel('Temperature [^{\circ}F')
-%ylim([0 9500])
+ylim([0 1.05])
 grid on
 
 title('nTH and T4, Varying Mass Flow Rate')
 xlabel('% Mass Flow Rate')
-legend([a1 a2],{'Thermal Efficiency','T4'}, Location = 'north')
+legend([a1 a2],{'Thermal Efficiency','T4'}, Location = 'east')
 
 %% Plot vs %m - T25, T3, T4, T48, T6
 figure
@@ -287,7 +295,7 @@ hold on
 plot(T_no, PNET_no, '.-', MarkerSize = 20)
 xlabel('Temperature [^{\circ}F]')
 ylabel('Generator Output [MW]')
-% ylim([0 40])
+ylim([0 40])
 legend('On','Off')
 title('Generator Output Evaporative Cooler Comparison')
 grid on
@@ -299,28 +307,29 @@ hold on
 plot(T_no, nTH_no, '.-', MarkerSize = 20)
 xlabel('Temperature [^{\circ}F]')
 ylabel('Thermal Efficiency')
-% ylim([0 40])
+ylim([0 .395])
 legend('On','Off')
 title('Thermal Efficiency Evaporative Cooler Comparison')
 grid on
 
 %% Plot vs To - T25, T3, T4, T48, T6 with and without evap cool
 figure
-plot(T_evap, T25_evap, '.-', MarkerSize = 20)
+plot(T_evap, T25_evap, '.-', MarkerSize = 20, Linewidth = 1.5)
 hold on
-plot(T_evap, T3_evap, '.-', MarkerSize = 20)
-plot(T_evap, T4_evap, '.-', MarkerSize = 20)
-plot(T_evap, T48_evap, '.-', MarkerSize = 20)
-plot(T_evap, T6_evap, '.-', MarkerSize = 20)
-plot(T_no, T25_no, '.-', MarkerSize = 20)
-plot(T_no, T3_no, '.-', MarkerSize = 20)
-plot(T_no, T4_no, '.-', MarkerSize = 20)
-plot(T_no, T48_no, '.-', MarkerSize = 20)
-plot(T_no, T6_no, '.-', MarkerSize = 20)
+plot(T_evap, T3_evap, '.-', MarkerSize = 20, Linewidth = 1.5)
+plot(T_evap, T4_evap, '.-', MarkerSize = 20, Linewidth = 1.5)
+plot(T_evap, T48_evap, '.-', MarkerSize = 20, Linewidth = 1.5)
+plot(T_evap, T6_evap, '.-', MarkerSize = 20, Linewidth = 1.5)
+plot(T_no, T25_no, 'k-', Linewidth = 1.5)
+plot(T_no, T3_no, 'k-', Linewidth = 1.5)
+plot(T_no, T4_no, 'k-', Linewidth = 1.5)
+plot(T_no, T48_no, 'k-', Linewidth = 1.5)
+plot(T_no, T6_no, 'k-', Linewidth = 1.5)
+scatter(T_no, T25_no, 10, 'k', 'filled', 'square')
 xlabel('Temperature [^{\circ}F]')
 ylabel('Temperature [^{\circ}F]')
 ylim([0 2500])
-legend('On, T25','On, T3','On, T4','On, T48','On, T6','Off, T25','Off, T3','Off, T4','Off, T48','Off, T6', Location = 'northwest')
+legend('On, T25','On, T3','On, T4','On, T48','On, T6','Off', Location = 'northwest')
 title('Stage Temperature Comparison, Varying Mass Flow Rate')
 grid on
 

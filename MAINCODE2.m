@@ -22,6 +22,14 @@ data2 = readtable('pressuretemps.xlsx');
 Temp2 = table2array(data2(:,"TempK"));
 press = table2array(data2(:,"PresskPa"));
 
+data3 = readtable('measured data.xlsx');
+InTemp = table2array(data3(:,"Inlet_Temperature"));
+POUT = table2array(data3(:,"Power_Output_MW"));
+T3 = table2array(data3(:,"T3"));
+T48 = table2array(data3(:,"T48"));
+T6 = table2array(data3(:,"T6"));
+
+
 %% gather base case phase 1 info
 [nT1, nT2, Vdot1b] = phase1_basecase(0);
 
@@ -140,6 +148,7 @@ figure
 plot(T_1, PNET_1, '.-', MarkerSize = 20)
 hold on
 plot(T_2, PNET_2, '.-', MarkerSize = 20)
+plot(InTemp, POUT, '.-', MarkerSize = 20)
 xlabel('Temperature [^{\circ}F]')
 ylabel('Generator Output [MW]')
 ylim([0 40])
@@ -195,10 +204,13 @@ plot(T_2, T3_2, '.-', MarkerSize = 20)
 plot(T_2, T4_2, '.-', MarkerSize = 20)
 plot(T_2, T48_2, '.-', MarkerSize = 20)
 plot(T_2, T6_2, '.-', MarkerSize = 20)
+plot(InTemp, T3, '.-', MarkerSize = 20)
+plot(InTemp, T48, '.-', MarkerSize = 20)
+plot(InTemp, T6, '.-', MarkerSize = 20)
 xlabel('Temperature [^{\circ}F]')
 ylabel('Temperature [^{\circ}F]')
 ylim([0 2500])
-legend('Phase 2 T25','Phase 2 T3','Phase 2 T4','Phase 2 T48','Phase 2 T6')
+legend('Phase 2 T25','Phase 2 T3','Phase 2 T4','Phase 2 T48','Phase 2 T6','Measured T3','Measured T48','Measured T6')
 title('Stage Temperature Comparison')
 grid on
 
