@@ -211,7 +211,7 @@ function [PNET, mdotin, mdotout, nTH, T25out, T3out, T4out, T48out, T6out, SFC, 
         hsH2Oo = hcalc(T4, 0, 0, 1, 0, MH2O);
         hsCO2o = hcalc(T4, 0, 0, 0, 1, MCO2);
 
-        Hdot4 = 1.04*ndotf*(hfCO2+hsCO2o) + ((4.08/2)*ndotf+A1dot)*(hfH2O+hsH2Oo) + (Aodot-1.04*ndotf)*(hsO2o) + 3.76*Aodot*hsN2o;
+        Hdot4 = 1.04*ndotf*(hfCO2+hsCO2o) + ((4.08/2)*ndotf+A1dot)*(hfH2O+hsH2Oo) + (Aodot-2.06*ndotf)*(hsO2o) + 3.76*Aodot*hsN2o;
         
         err = abs(Hdot3-Hdot4);
 
@@ -229,7 +229,7 @@ function [PNET, mdotin, mdotout, nTH, T25out, T3out, T4out, T48out, T6out, SFC, 
     ndotp = 1.04*ndotf+(4.08/2)*ndotf+A1dot+Aodot-1.04*ndotf+Aodot*3.76;
     yCO2p = (1.04*ndotf)/ndotp;
     yH2Op = ((4.08/2)*ndotf+A1dot)/ndotp;
-    yO2p = (Aodot-1.04*ndotf)/ndotp;
+    yO2p = (Aodot-2.06*ndotf)/ndotp;
     yN2p = (Aodot*3.76)/ndotp;
 
     Mp = yCO2p*MCO2+yH2Op*MH2O+yO2p*MO2+yN2p*MN2;
