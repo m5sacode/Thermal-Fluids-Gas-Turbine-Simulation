@@ -165,7 +165,7 @@ plot(T_2, PNET_2, '.-', MarkerSize = 20)
 plot(InTemp, POUT, '.-', MarkerSize = 20)
 xlabel('Temperature [^{\circ}F]')
 ylabel('Generator Output [MW]')
-ylim([0 40])
+ylim([0 50])
 legend('Phase 1','Phase 2','Measured Values')
 title('Generator Output Comparison')
 grid on

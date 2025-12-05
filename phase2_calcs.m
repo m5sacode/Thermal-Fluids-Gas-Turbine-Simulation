@@ -35,7 +35,7 @@ function [PNET, mdotin, mdotout, nTH, T25out, T3out, T4out, T48out, T6out, SFC, 
     % ambient air conditions
     p0 = 14.417 * psi2kPa; % kPa
     T0 = (Tin + 459.67) * R2K; % K
-    RH0 = .6; % percent
+    RH0 = .6; 
     
     % altitude (not used in phase 1)
     ALT = 530 * ft2m; % m
@@ -97,7 +97,7 @@ function [PNET, mdotin, mdotout, nTH, T25out, T3out, T4out, T48out, T6out, SFC, 
     
     %% state 1 -> 2: evaporative cooler
     p2 = p1;
-    w1 = wcalc(RH1,p1,T1);
+    w1 = wcalc(RH1,p1,T1); 
 
     if Evap == 1
         RH2 = 1;
@@ -113,7 +113,7 @@ function [PNET, mdotin, mdotout, nTH, T25out, T3out, T4out, T48out, T6out, SFC, 
         Tmin = 271.01;
         Tmax = 633;
         
-        while err > 1e-3
+        while err > 1e-4
             T2 = (Tmin+Tmax)/2;
             ha2 = hcalc(T2,yO2,yN2,0,0,Mair)/Mair;
             hv2 = hcalc(T2,0,0,1,0,MH2O)/MH2O;
@@ -154,9 +154,9 @@ function [PNET, mdotin, mdotout, nTH, T25out, T3out, T4out, T48out, T6out, SFC, 
 
     %% state 2 -> 25: LP compressor
     p25 = p2 * rLPC;
-    sb2 = scalc(T2, y2O2, y2N2, y2H2O, 0, M2);
+    sb2 = scalc(T2, p2, y2O2, y2N2, y2H2O, 0, M2);
     sb25s = sb2 + Rbar*log(p25/p2);
-    T25s = TcalcS2(sb25s, y2O2, y2N2, y2H2O, 0, M2);
+    T25s = TcalcS2(sb25s, p25, y2O2, y2N2, y2H2O, 0, M2);
     hb25s = hcalc(T25s,y2O2,y2N2,y2H2O,0,M2);
     h25s = hb25s / M2;
     h25 = h2 - (h2 - h25s)/nLPC;
@@ -166,15 +166,15 @@ function [PNET, mdotin, mdotout, nTH, T25out, T3out, T4out, T48out, T6out, SFC, 
     
     %% state 25 -> 3: HP compressor
     p3 = p25 * rHPC;
-    sb25 = scalc(T25, y2O2, y2N2, y2H2O, 0, M2);
+    sb25 = scalc(T25, p25, y2O2, y2N2, y2H2O, 0, M2);
     sb3s = sb25 + Rbar*log(p3/p25);
-    T3s = TcalcS2(sb3s, y2O2, y2N2, y2H2O, 0, M2);
+    T3s = TcalcS2(sb3s, p3, y2O2, y2N2, y2H2O, 0, M2);
     hb3s = hcalc(T3s,y2O2,y2N2,y2H2O,0,M2);
     h3s = hb3s / M2;
     h3 = h25 - (h25 - h3s)/nHPC;
     hb3 = h3 * M2;
     T3 = TcalcH2(hb3, y2O2, y2N2, y2H2O, 0, M2);
-    sb3 = scalc(T3, y2O2, y2N2, y2H2O, 0, M2);
+    sb3 = scalc(T3, p3, y2O2, y2N2, y2H2O, 0, M2);
     WdotC2 = mdot2*(h3-h25);
     
     %% state 3 -> 4: combustor
@@ -236,10 +236,10 @@ function [PNET, mdotin, mdotout, nTH, T25out, T3out, T4out, T48out, T6out, SFC, 
 
     h4 = hcalc(T4,yO2p,yN2p,yH2Op,yCO2p,Mp)/Mp;
 
-    sb4 = scalc(T4,yO2p,yN2p,yH2Op,yCO2p,Mp);
-    
     p4 = p3;
 
+    sb4 = scalc(T4, p4,yO2p,yN2p,yH2Op,yCO2p,Mp);
+    
     mdotp = ndotp*Mp;
 
 
@@ -248,24 +248,24 @@ function [PNET, mdotin, mdotout, nTH, T25out, T3out, T4out, T48out, T6out, SFC, 
     h48 = h4 - (WdotT1/mdotp);
     hb48 = h48 * Mp;
     T48 = TcalcH2(hb48,yO2p,yN2p,yH2Op,yCO2p,Mp);
-    sb48 = scalc(T48,yO2p,yN2p,yH2Op,yCO2p,Mp);
+    sb48 = scalc(T48,p48,yO2p,yN2p,yH2Op,yCO2p,Mp);
     wT1 = WdotT1/mdotp;
     h48s = h4 - wT1/nHPT;
     hb48s = h48s * Mp;
     T48s = TcalcH2(hb48s,yO2p,yN2p,yH2Op,yCO2p,Mp);
-    sb48s = scalc(T48s,yO2p,yN2p,yH2Op,yCO2p,Mp);
+    sb48s = scalc(T48s, p48, yO2p,yN2p,yH2Op,yCO2p,Mp);
     p48 = p4*exp((sb48s-sb4)/Rbar);
 
     %% state 48 -> 5: LP turbine
     p5 = p0 + delPex;
     sb5s = sb48 + Rbar*log(p5/p48); 
-    T5s = TcalcS2(sb5s,yO2p,yN2p,yH2Op,yCO2p,Mp);
+    T5s = TcalcS2(sb5s,p5,yO2p,yN2p,yH2Op,yCO2p,Mp);
     hb5s = hcalc(T5s,yO2p,yN2p,yH2Op,yCO2p,Mp);
     h5s = hb5s / Mp;
     h5 = h48 - nLPT*(h48-h5s);
     hb5 = h5 * Mp;
     T5 = TcalcH2(hb5,yO2p,yN2p,yH2Op,yCO2p,Mp);
-    sb5 = scalc(T5,yO2p,yN2p,yH2Op,yCO2p,Mp);
+    sb5 = scalc(T5,p5,yO2p,yN2p,yH2Op,yCO2p,Mp);
     WdotT2 = mdotp*(h48 - h5);
     WdotELEC = WdotT2*nGEN;
 
@@ -273,7 +273,7 @@ function [PNET, mdotin, mdotout, nTH, T25out, T3out, T4out, T48out, T6out, SFC, 
     p6 = p0;
     
     T6 = T5;
-    sb6 = scalc(T6,yO2p,yN2p,yH2Op,yCO2p,Mp);
+    sb6 = scalc(T6,p6,yO2p,yN2p,yH2Op,yCO2p,Mp);
     
     %% Output Performance Parameters
     
@@ -299,7 +299,7 @@ function [PNET, mdotin, mdotout, nTH, T25out, T3out, T4out, T48out, T6out, SFC, 
     SFC = mdotf/WdotELEC * 1/lb2kg * hr2s; 
     HR = SFC*LHV * 1/BTUlb2kJkg;
     FARa = ndotf / ndota;
-    FARs = 1 / (1.04 * 4.76);
+    FARs = 1 / (2.06 * 4.76);
     ER = FARa / FARs;
     TWR = (WdotC1 + WdotC2)/(WdotT1 + WdotT2);
     
