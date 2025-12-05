@@ -303,15 +303,13 @@ function [PNET, mdotin, mdotout, nTH, T25out, T3out, T4out, T48out, T6out, SFC, 
     ER = FARa / FARs;
     TWR = (WdotC1 + WdotC2)/(WdotT1 + WdotT2);
     
-    %% T–s diagram
-    hMain = []; % placeholder in case no plot happens
+    %% T–s diagram (fixed, consistent)
+hMain = []; 
 if isa(TSplot, 'matlab.graphics.axis.Axes')
-    ax = TSplot;  % Existing axes handle passed in
+    ax = TSplot;
     hold(ax, 'on');
 elseif isequal(TSplot, 1)
-    figure;
-    ax = gca;
-    hold(ax, 'on');
+    figure; ax = gca; hold(ax, 'on');
 else
     return;
 end
@@ -319,45 +317,54 @@ end
 % --- Define states
 states = [1 2 25 3 4 48 5 6]';
 
-% Reference for real entropy change (T–S diagram)
-sbref = 0;
+% === 1) Build consistent mole fractions for each state ===
+% State 1 (ambient dry-air mole fractions + vapor mole fraction computed from ndot if available)
+% If you don't have ndot breakdown for state1, compute mole fraction of vapor from w1:
+% w1 = mass H2O / mass dry air  -> mole H2O per mole dry air = (w1/MH2O) / ((1)/Mair_dry)
+% Safer: use ndota/ndot2 and ndotv2 computed upstream to get true mole fractions.
+% Here we prefer to use ndot breakdown if available:
+if exist('ndota','var') && exist('ndotv2','var')
+    ndot1_total = ndota + ndotv2;
+    y1H2O = ndotv2 / ndot1_total;
+    % dry air mole fractions (assumes composition yO2,yN2 are mole fractions of dry air)
+    y1O2 = yO2 * (ndota/ndot1_total);
+    y1N2 = yN2 * (ndota/ndot1_total);
+else
+    % fallback (approximate): convert humidity ratio w1 to mole fraction
+    % convert mass-based w1 -> mole fraction yH2O:
+    % m_H2O = w1 * m_dry; n_H2O = m_H2O/MH2O; n_dry = m_dry / Mair; yH2O = n_H2O/(n_H2O + n_dry)
+    nH2O_per_mdry = w1 / MH2O;
+    ndry_per_mdry = 1 / Mair;
+    y1H2O = nH2O_per_mdry / (nH2O_per_mdry + ndry_per_mdry);
+    y1O2 = yO2 * (1 - y1H2O);
+    y1N2 = yN2 * (1 - y1H2O);
+end
+M1 = y1O2*MO2 + y1N2*MN2 + y1H2O*MH2O;    % mixture MW (kg/kmol)
 
-% --- calculate specific entropies
-sb1r = sbref;
-sb2r   = sb1r + sb2 - sb1 - Rbar*log(p2/p0);
-sb25r  = sb2r + sb25 - sb2 - Rbar*log(p25/p2);
-sb25rs = sb2r + sb25s - sb2 - Rbar*log(p25/p2);
-sb3rs  = sb25r + sb3s - sb25 - Rbar*log(p3/p25);
-sb3r   = sb25r + sb3 - sb25 - Rbar*log(p3/p25);
-sb4r   = sb3r + sb4 - sb3 - Rbar*log(p4/p3);
-sb48r  = sb4r + sb48 - sb4 - Rbar*log(p48/p4);
-sb48rs = sb4r + sb48s - sb4 - Rbar*log(p48/p4);
-sb5r   = sb48r + sb5 - sb48 - Rbar*log(p5/p48);
-sb5rs  = sb48r;
-sb6r   = sb5r + sb6 - sb5 - Rbar*log(p6/p5);
+% State 2/25/3 use M2 and mole fractions y2O2,y2N2,y2H2O (already set earlier)
+% State 4/48/5/6 use Mp and mole fractions yO2p,yN2p,yH2Op,yCO2p
 
-% --- Collect specific entropies (kJ/kg·K)
-allS = [ ...
-    sb1r/Mair
-    sb2r/Mair
-    sb25r/Mair
-    sb3r/Mair
-    sb4r/Mair
-    sb48r/Mair
-    sb5r/Mair
-    sb6r/Mair ];
+% === 2) Compute specific entropies consistently in kJ/kg-K ===
+s1  = scalc(T1,  y1O2, y1N2, y1H2O, 0,  M1)  / 1;   % kJ/kg-K
+s2  = scalc(T2,  y2O2, y2N2, y2H2O, 0,  M2)  / 1;
+s25 = scalc(T25, y2O2, y2N2, y2H2O, 0,  M2)  / 1;
+s3  = scalc(T3,  y2O2, y2N2, y2H2O, 0,  M2)  / 1;
+s4  = scalc(T4,  yO2p, yN2p, yH2Op, yCO2p, Mp) / 1;
+s48 = scalc(T48, yO2p, yN2p, yH2Op, yCO2p, Mp) / 1;
+s5  = scalc(T5,  yO2p, yN2p, yH2Op, yCO2p, Mp) / 1;
+s6  = scalc(T6,  yO2p, yN2p, yH2Op, yCO2p, Mp) / 1;
 
-% --- Assign a unique color from the current color order
+allS = [s1; s2; s25; s3; s4; s48; s5; s6];
+
+% --- Assign color
 colorOrder = ax.ColorOrder;
 colorIndex = mod(ax.ColorOrderIndex-1, size(colorOrder,1)) + 1;
 color = colorOrder(colorIndex, :);
 
 % --- Plot 1–2–25–3
-hMain = plot(ax, allS(1:4), [T0 T2 T25 T3], 'o-', ...
+hMain = plot(ax, allS(1:4), [T1 T2 T25 T3], 'o-', ...
     'Color', color, 'LineWidth', 1, 'MarkerSize', 6, ...
     'DisplayName', sprintf('%.0f%% fuel rate', round(100*mdotf/1.8374)));
-
-
 
 % --- Plot 4–48–5–6
 plot(ax, allS(5:8), [T4 T48 T5 T6], 'o-', 'Color', color, ...
@@ -370,12 +377,17 @@ title(ax, ['Gas Turbine T–s Diagram at fuel mass flow: ', ...
 grid(ax, 'on');
 
 % --- Label states
-text(ax, allS, [T0 T2 T25 T3 T4 T48 T5 T6], string(states), ...
+text(ax, allS, [T1 T2 T25 T3 T4 T48 T5 T6], string(states), ...
     'VerticalAlignment','bottom', 'HorizontalAlignment','right');
 
-% --- Isentropic points
-S_iso = [sb25rs/Mair, sb3rs/Mair, sb48rs/Mair, sb5rs/Mair];
-T_iso = [T25s,     T3s,     T48s,    T5s];
+% === 3) Isentropic points (compute using same mixture MW & units) ===
+s25s = scalc(T25s, y2O2, y2N2, y2H2O, 0,  M2)  / 1;
+s3s  = scalc(T3s,  y2O2, y2N2, y2H2O, 0,  M2)  / 1;
+s48s = scalc(T48s, yO2p, yN2p, yH2Op, yCO2p, Mp)/ 1;
+s5s  = scalc(T5s,  yO2p, yN2p, yH2Op, yCO2p, Mp)/ 1;
+
+S_iso = [s25s, s3s, s48s, s5s];
+T_iso = [T25s, T3s, T48s, T5s];
 labels_iso = {'25s','3s','48s','5s'};
 
 scatter(ax, S_iso, T_iso, 60, [0.5 0.5 0.5], 'x', 'LineWidth', 1.5);
@@ -383,40 +395,73 @@ text(ax, S_iso, T_iso, labels_iso, ...
     'VerticalAlignment','top', 'HorizontalAlignment','left', ...
     'Color', [0.5 0.5 0.5],'FontSize',6);
 
-% --- Connect turbine inlets to isentropic outlets
-S_in = [sb2r/Mair, sb25r/Mair, sb4r/Mair, sb48r/Mair];
-T_in = [T2,     T25,     T4,     T48];
-
+% --- Connect inlets to their isentropic outlets (using same units)
+S_in = [s2, s25, s4, s48];
+T_in = [T2, T25, T4, T48];
 for k = 1:length(S_iso)
-    plot(ax, [S_iso(k) S_iso(k)], [T_in(k) T_iso(k)], ...
+    plot(ax, [S_in(k) S_iso(k)], [T_in(k) T_iso(k)], ...
         '--', 'Color', [0.5 0.5 0.5], 'LineWidth', 0.8);
 end
 
-% --- Example isobars
-iso_curve_25s_25 = ts_isobar(p25, T0, T25, p0, Rbar, T25s);
-plot(ax, iso_curve_25s_25(:,1)/Mair, iso_curve_25s_25(:,2), ...
+
+
+% === 1. Isobar from 25s → 25 (humid air mixture) ===
+iso_curve_25s_25 = ts_isobar2( ...
+    p25, T0, T25, p0, ...
+    y2O2, y2N2, y2H2O, 0, M2, T25s);
+
+plot(ax, iso_curve_25s_25(:,1), iso_curve_25s_25(:,2), ...
     '--', 'Color', [0.5 0.5 0.5], 'LineWidth', 1);
 
-iso_curve_3s_3 = ts_isobar(p3, T0, T3, p0, Rbar, T3s);
-plot(ax, iso_curve_3s_3(:,1)/Mair, iso_curve_3s_3(:,2), ...
+
+% === 2. Isobar from 3s → 3 (humid air) ===
+iso_curve_3s_3 = ts_isobar2( ...
+    p3, T0, T3, p0, ...
+    y2O2, y2N2, y2H2O, 0, M2, T3s);
+
+plot(ax, iso_curve_3s_3(:,1), iso_curve_3s_3(:,2), ...
     '--', 'Color', [0.5 0.5 0.5], 'LineWidth', 1);
 
-iso_curve_3_4 = ts_isobar(p3, T0, T4, p0, Rbar, T3);
-plot(ax, iso_curve_3_4(:,1)/Mair, iso_curve_3_4(:,2), ...
+
+% === 3. Isobar from 3 → 4 (humid air → stop at combustor inlet) ===
+iso_curve_3_4 = ts_isobar2( ...
+    p3, T0, T4, p0, ...
+    y2O2, y2N2, y2H2O, 0, M2, T3);
+
+plot(ax, iso_curve_3_4(:,1), iso_curve_3_4(:,2), ...
     '-', 'Color', color, 'LineWidth', 1);
 
-iso_curve_48s_48 = ts_isobar(p48, T0, T48, p0, Rbar, T48s);
-plot(ax, iso_curve_48s_48(:,1)/Mair, iso_curve_48s_48(:,2), ...
+
+% === 4. Isobar from 48s → 48 (combustion products) ===
+iso_curve_48s_48 = ts_isobar2( ...
+    p48, T0, T48, p0, ...
+    yO2p, yN2p, yH2Op, yCO2p, Mp, T48s);
+
+plot(ax, iso_curve_48s_48(:,1), iso_curve_48s_48(:,2), ...
     '--', 'Color', [0.5 0.5 0.5], 'LineWidth', 1);
 
-iso_curve_5s_5 = ts_isobar(p5, T0, T5, p0, Rbar, T5s);
-plot(ax, iso_curve_5s_5(:,1)/Mair, iso_curve_5s_5(:,2), ...
+
+% === 5. Isobar from 5s → 5 (combustion products) ===
+iso_curve_5s_5 = ts_isobar2( ...
+    p5, T0, T5, p0, ...
+    yO2p, yN2p, yH2Op, yCO2p, Mp, T5s);
+
+plot(ax, iso_curve_5s_5(:,1), iso_curve_5s_5(:,2), ...
     '--', 'Color', [0.5 0.5 0.5], 'LineWidth', 1);
 
-iso_curve_1_6 = ts_isobar(p6, T0, T6, p0, Rbar, T0);
-plot(ax, iso_curve_1_6(:,1)/Mair, iso_curve_1_6(:,2), ...
+
+% === 6. Isobar from 1 → 6 (products expanding to nozzle exit pressure) ===
+iso_curve_1_6 = ts_isobar2( ...
+    p6, T0, T6, p0, ...
+    yO2p, yN2p, yH2Op, yCO2p, Mp, T0);
+
+plot(ax, iso_curve_1_6(:,1), iso_curve_1_6(:,2), ...
     '--', 'Color', color, 'LineWidth', 1);
 
 hold(ax, 'off');
+
+
+
+
 
 end

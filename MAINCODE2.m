@@ -98,10 +98,24 @@ HR_m = zeros(1,5);
 ER_m = zeros(1,4);
 TWR_m = zeros(1,4);
 
+figure('Name','Combined T–S Diagrams','Color','w');
+ax = gca;
+hold(ax, 'on');
+
+colors = lines(5);
+h = gobjects(1,5); % handles for legend entries
+
 
 for i = 1:5
-    [PNET_m(i), mdotin_m(i), mdotout_m(i), nTH_m(i), T25_m(i), T3_m(i), T4_m(i), T48_m(i), T6_m(i), SFC_m(i), HR_m(i), ER_m(i), TWR_m(i)] = phase2_calcs(nT1, nT2, T, mdotf(i), Vdot1b, RPM, 0, 0, 1);
+    [PNET_m(i), mdotin_m(i), mdotout_m(i), nTH_m(i), T25_m(i), T3_m(i), T4_m(i), T48_m(i), T6_m(i), SFC_m(i), HR_m(i), ER_m(i), TWR_m(i), h(i)] = phase2_calcs(nT1, nT2, T, mdotf(i), Vdot1b, RPM, 0, ax, 1);
 end
+
+legend(ax, h, 'Location','best');
+xlabel(ax, 'Specific Entropy s (kJ/kg·K)');
+ylabel(ax, 'Temperature T (K)');
+title(ax, 'Combined Gas Turbine T–S Diagrams');
+grid(ax, 'on');
+hold(ax, 'off');
 
 %% varying inlet temps phase 2 EVAP
 T_evap = [50 65 85 105];
