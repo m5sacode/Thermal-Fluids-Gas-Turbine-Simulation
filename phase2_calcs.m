@@ -226,7 +226,7 @@ function [PNET, mdotin, mdotout, nTH, T25out, T3out, T4out, T48out, T6out, SFC, 
     Qdot = mdotf * LHV;
 
     % properties downstream of combustor
-    ndotp = 1.04*ndotf+(4.08/2)*ndotf+A1dot+Aodot-1.04*ndotf+Aodot*3.76;
+    ndotp = 1.04*ndotf+(4.08/2)*ndotf+A1dot+Aodot-2.06*ndotf+Aodot*3.76;
     yCO2p = (1.04*ndotf)/ndotp;
     yH2Op = ((4.08/2)*ndotf+A1dot)/ndotp;
     yO2p = (Aodot-2.06*ndotf)/ndotp;
