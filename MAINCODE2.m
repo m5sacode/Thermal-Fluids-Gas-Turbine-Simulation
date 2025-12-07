@@ -289,7 +289,7 @@ grid on
 
 title('nTH and T4, Varying Mass Flow Rate')
 xlabel('% Mass Flow Rate')
-legend([a1 a2],{'Thermal Efficiency','T4'}, Location = 'east')
+legend([a1 a2],{'Thermal Efficiency','T4'}, Location = 'southeast')
 
 %% Plot vs %m - T25, T3, T4, T48, T6
 figure
