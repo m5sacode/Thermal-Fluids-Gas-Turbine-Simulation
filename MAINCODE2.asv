@@ -34,7 +34,7 @@ T6 = table2array(data3(:,"T6"));
 [nT1, nT2, Vdot1b] = phase1_basecase(0);
 
 %% base case phase 2
-[PNET, mdotin, mdotout, nTH, Tturb, Teng, SFC, HR, hMain] = phase2_calcs(nT1, nT2, 65, 14585, Vdot1b, 9784, 1, 0, 0);
+[PNET, mdotin, mdotout, nTH, Tturb, Teng, SFC, HR, hMain] = phase2_calcs(nT1, nT2, 65, 14585, Vdot1b, 9784, 1, 0, 1);
 
 %% varying inlet temps phase 1
 T_1 = [35 65 85 105];
@@ -214,13 +214,13 @@ title('Temperature at Stage 4 and Equivalence Ratio')
 figure
 plot(T_2, T25_2, '.-', MarkerSize = 20)
 hold on
-plot(T_2, T3_2, 'r.-', MarkerSize = 20)
+plot(T_2, T3_2, '.-', MarkerSize = 20)
 plot(T_2, T4_2, '.-', MarkerSize = 20)
-plot(T_2, T48_2, '.-', 'Color', [0 0.5 0], MarkerSize = 20)
-plot(T_2, T6_2, 'b.-', MarkerSize = 20)
-plot(InTemp, T3, 'r.--', MarkerSize = 20)
-plot(InTemp, T48, '.--', 'Color', [0 0.5 0],MarkerSize = 20)
-plot(InTemp, T6, 'b.--', MarkerSize = 20)
+plot(T_2, T48_2, '.-', MarkerSize = 20)
+plot(T_2, T6_2, '.-', MarkerSize = 20)
+plot(InTemp, T3, '.--', MarkerSize = 20)
+plot(InTemp, T48, '.--', MarkerSize = 20)
+plot(InTemp, T6, '.--', MarkerSize = 20)
 xlabel('Temperature [^{\circ}F]')
 ylabel('Temperature [^{\circ}F]')
 ylim([0 2500])
