@@ -7,7 +7,7 @@ function [T, P, cp, cv, k, u, h, so, s] = propertycalc(T, P, yO2, yN2, yH2O, yCO
     if nargin < 7
         print = 0;
     end
-
+  
     % initialize molar masses 
     MO2 = 32.00; 
     MN2 = 28.01; 

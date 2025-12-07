@@ -34,7 +34,7 @@ T6 = table2array(data3(:,"T6"));
 [nT1, nT2, Vdot1b] = phase1_basecase(0);
 
 %% base case phase 2
-[PNET, mdotin, mdotout, nTH, Tturb, Teng, SFC, HR, hMain] = phase2_calcs(nT1, nT2, 65, 14585, Vdot1b, 9784, 1, 0, 1);
+[PNET, mdotin, mdotout, nTH, Tturb, Teng, SFC, HR, hMain] = phase2_calcs(nT1, nT2, 65, 14585, Vdot1b, 9784, 1, 0, 0);
 
 %% varying inlet temps phase 1
 T_1 = [35 65 85 105];
@@ -74,7 +74,7 @@ ER_2 = zeros(1,4);
 TWR_2 = zeros(1,4);
 
 for i = 1:4
-    [PNET_2(i), mdotin_2(i), mdotout_2(i), nTH_2(i), T25_2(i), T3_2(i), T4_2(i), T48_2(i), T6_2(i), SFC_2(i), HR_2(i), ER_2(i), TWR_2(i)] = phase2_calcs(nT1, nT2, T_2(i), mdotf_2(i), Vdot1b, RPM(i), 0, 0, 1);
+    [PNET_2(i), mdotin_2(i), mdotout_2(i), nTH_2(i), T25_2(i), T3_2(i), T4_2(i), T48_2(i), T6_2(i), SFC_2(i), HR_2(i), ER_2(i), TWR_2(i)] = phase2_calcs(nT1, nT2, T_2(i), mdotf_2(i), Vdot1b, RPM(i), 0, 0, 0);
 end
 
 %% varying % mass flow rate
@@ -98,24 +98,24 @@ HR_m = zeros(1,5);
 ER_m = zeros(1,4);
 TWR_m = zeros(1,4);
 
-figure('Name','Combined T–S Diagrams','Color','w');
-ax = gca;
-hold(ax, 'on');
-
-colors = lines(5);
-h = gobjects(1,5); % handles for legend entries
-
-
+% figure('Name','Combined T–S Diagrams','Color','w');
+% ax = gca;
+% hold(ax, 'on');
+% 
+% colors = lines(5);
+% h = gobjects(1,5); % handles for legend entries
+% 
+% 
 for i = 1:5
-    [PNET_m(i), mdotin_m(i), mdotout_m(i), nTH_m(i), T25_m(i), T3_m(i), T4_m(i), T48_m(i), T6_m(i), SFC_m(i), HR_m(i), ER_m(i), TWR_m(i), h(i)] = phase2_calcs(nT1, nT2, T, mdotf(i), Vdot1b, RPM, 0, ax, 1);
+    [PNET_m(i), mdotin_m(i), mdotout_m(i), nTH_m(i), T25_m(i), T3_m(i), T4_m(i), T48_m(i), T6_m(i), SFC_m(i), HR_m(i), ER_m(i), TWR_m(i)] = phase2_calcs(nT1, nT2, T, mdotf(i), Vdot1b, RPM, 0, 0, 0);
 end
-
-legend(ax, h, 'Location','best');
-xlabel(ax, 'Specific Entropy s (kJ/kg·K)');
-ylabel(ax, 'Temperature T (K)');
-title(ax, 'Combined Gas Turbine T–S Diagrams');
-grid(ax, 'on');
-hold(ax, 'off');
+% 
+% legend(ax, h, 'Location','best');
+% xlabel(ax, 'Specific Entropy s (kJ/kg·K)');
+% ylabel(ax, 'Temperature T (K)');
+% title(ax, 'Combined Gas Turbine T–S Diagrams');
+% grid(ax, 'on');
+% hold(ax, 'off');
 
 %% varying inlet temps phase 2 EVAP
 T_evap = [50 65 85 105];
@@ -133,7 +133,7 @@ T48_evap = zeros(1,4);
 T6_evap = zeros(1,4);
 
 for i = 1:4
-    [PNET_evap(i), mdotin_evap(i), mdotout_evap(i), nTH_evap(i), T25_evap(i), T3_evap(i), T4_evap(i), T48_evap(i), T6_evap(i)] = phase2_calcs(nT1, nT2, T_evap(i), mdotf_evap(i), Vdot1b, RPM(i), 0, 0, 0);
+    [PNET_evap(i), mdotin_evap(i), mdotout_evap(i), nTH_evap(i), T25_evap(i), T3_evap(i), T4_evap(i), T48_evap(i), T6_evap(i)] = phase2_calcs(nT1, nT2, T_evap(i), mdotf_evap(i), Vdot1b, RPM(i), 0, 0, 1);
 end
 
 %% varying inlet temps phase 2 NO EVAP
@@ -152,7 +152,7 @@ T48_no = zeros(1,4);
 T6_no = zeros(1,4);
 
 for i = 1:4
-    [PNET_no(i), mdotin_no(i), mdotout_no(i), nTH_no(i), T25_no(i), T3_no(i), T4_no(i), T48_no(i), T6_no(i)] = phase2_calcs(nT1, nT2, T_no(i), mdotf_no(i), Vdot1b, RPM(i), 0, 0, 1);
+    [PNET_no(i), mdotin_no(i), mdotout_no(i), nTH_no(i), T25_no(i), T3_no(i), T4_no(i), T48_no(i), T6_no(i)] = phase2_calcs(nT1, nT2, T_no(i), mdotf_no(i), Vdot1b, RPM(i), 0, 0, 0);
 end
 
 %% Plots
@@ -165,7 +165,7 @@ plot(T_2, PNET_2, '.-', MarkerSize = 20)
 plot(InTemp, POUT, '.-', MarkerSize = 20)
 xlabel('Temperature [^{\circ}F]')
 ylabel('Generator Output [MW]')
-ylim([0 50])
+ylim([0 40])
 legend('Phase 1','Phase 2','Measured Values')
 title('Generator Output Comparison')
 grid on
@@ -203,7 +203,7 @@ ylim([0 2500])
 yyaxis right
 plot(T_2, ER_2, '.-', MarkerSize = 20)
 ylabel('Eq Ratio')
-ylim([0 .2])
+ylim([0 .4])
 grid on
 
 xlabel('Temperature [^{\circ}F]')
@@ -224,7 +224,7 @@ plot(InTemp, T6, '.-', MarkerSize = 20)
 xlabel('Temperature [^{\circ}F]')
 ylabel('Temperature [^{\circ}F]')
 ylim([0 2500])
-legend('Phase 2 T25','Phase 2 T3','Phase 2 T4','Phase 2 T48','Phase 2 T6','Measured T3','Measured T48','Measured T6')
+legend('Phase 2 T25','Phase 2 T3','Phase 2 T4','Phase 2 T48','Phase 2 T6','Measured T3','Measured T48','Measured T6', NumColumns = 3, Location = 'south')
 title('Stage Temperature Comparison')
 grid on
 
@@ -279,7 +279,7 @@ figure
 yyaxis left
 a1 = plot(percent*100, nTH_m, '.-', MarkerSize = 20);
 ylabel('nTH')
-ylim([-.05 .4])
+ylim([0 .4])
 
 yyaxis right
 a2 = plot(percent*100, TWR_m, '.-', MarkerSize = 20);
@@ -314,6 +314,7 @@ plot(T_no, PNET_no, '.-', MarkerSize = 20)
 xlabel('Temperature [^{\circ}F]')
 ylabel('Generator Output [MW]')
 ylim([0 40])
+xlim([45 110])
 legend('On','Off')
 title('Generator Output Evaporative Cooler Comparison')
 grid on
@@ -326,7 +327,8 @@ plot(T_no, nTH_no, '.-', MarkerSize = 20)
 xlabel('Temperature [^{\circ}F]')
 ylabel('Thermal Efficiency')
 ylim([0 .395])
-legend('On','Off')
+xlim([45 110])
+legend('On','Off',Location='southeast')
 title('Thermal Efficiency Evaporative Cooler Comparison')
 grid on
 
@@ -346,8 +348,9 @@ plot(T_no, T6_no, 'k-', Linewidth = 1.5)
 scatter(T_no, T25_no, 10, 'k', 'filled', 'square')
 xlabel('Temperature [^{\circ}F]')
 ylabel('Temperature [^{\circ}F]')
-ylim([0 2500])
-legend('On, T25','On, T3','On, T4','On, T48','On, T6','Off', Location = 'northwest')
+ylim([0 2600])
+xlim([45 110])
+legend('On, T25','On, T3','On, T4','On, T48','On, T6','Off', NumColumns = 2, Location = 'best')
 title('Stage Temperature Comparison, Varying Mass Flow Rate')
 grid on
 
