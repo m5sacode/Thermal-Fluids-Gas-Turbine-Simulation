@@ -266,11 +266,11 @@ ylim([-.1 40])
 
 yyaxis right
 a2 = plot(percent*100, TWR_m, '.-', MarkerSize = 20);
-ylabel('TR')
+ylabel('TWR')
 ylim([0 1.05])
 grid on
 
-title('Power Output and TR, Varying Mass Flow Rate')
+title('Power Output and TWR, Varying Mass Flow Rate')
 xlabel('% Mass Flow Rate')
 legend([a1 a2],{'Generator Power Output','Turbine Work Ratio'}, Location = 'north')
 
@@ -282,9 +282,9 @@ ylabel('nTH')
 ylim([0 .4])
 
 yyaxis right
-a2 = plot(percent*100, TWR_m, '.-', MarkerSize = 20);
+a2 = plot(percent*100, T4_m, '.-', MarkerSize = 20);
 ylabel('Temperature [^{\circ}F')
-ylim([0 1.05])
+% ylim([0 1.05])
 grid on
 
 title('nTH and T4, Varying Mass Flow Rate')
